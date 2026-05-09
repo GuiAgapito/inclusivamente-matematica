@@ -3,190 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ábaco 3D Interativo</title>
+    <title>Ábaco 3D Profissional - Contraste Máximo</title>
     <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #87CEEB; /* Céu azul suave, amigável para crianças */
-            font-family: sans-serif;
+        body { margin: 0; overflow: hidden; background: #bae6fd; font-family: 'Segoe UI', sans-serif; }
+        #game-ui {
+            position: absolute; top: 20px; right: 20px; 
+            background: rgba(255, 255, 255, 0.92); padding: 20px; border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 260px;
+            border: 1px solid #7dd3fc; z-index: 100;
         }
-        #info {
-            position: absolute;
-            top: 10px;
-            width: 100%;
-            text-align: center;
-            color: #333;
-            pointer-events: none;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 10px 0;
-            font-size: 18px;
-            font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
+        #game-ui h2 { margin: 0 0 15px 0; color: #0369a1; font-size: 1.1rem; }
+        input { width: 85%; padding: 10px; font-size: 1.2rem; border: 2px solid #bae6fd; border-radius: 8px; margin-bottom: 10px; text-align: center; font-weight: bold; }
+        button { width: 100%; padding: 12px; cursor: pointer; border: none; border-radius: 8px; font-weight: bold; margin-bottom: 8px; transition: all 0.2s; }
+        .btn-check { background: #10b981; color: white; }
+        .btn-random { background: #0284c7; color: white; }
+        .btn-reset { background: #ef4444; color: white; }
+        #feedback { margin-top: 10px; font-weight: bold; min-height: 45px; font-size: 0.95rem; color: #334155; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-    <div id="info">Ábaco 3D: Clique nas pecinhas para mover e arraste a tela para girar!</div>
+    <div id="game-ui">
+        <h2>🔢 Qual é o número?</h2>
+        <input type="number" id="user-input" placeholder="Valor...">
+        <button class="btn-check" onclick="checkResult()">Verificar Resposta</button>
+        <button class="btn-random" onclick="generateChallenge()">Novo Desafio</button>
+        <button class="btn-reset" onclick="resetAbacus()">Zerar Ábaco</button>
+        <div id="feedback">Toque nas peças!</div>
+    </div>
+
+    <audio id="quack-sound" src="https://cdn.jsdelivr.net/gh/themikeymike/pato-3d-abaco/quack.mp3" preload="auto"></audio>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
     <script>
-        // 1. CONFIGURAÇÃO BÁSICA (Cena, Câmera e Renderizador)
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xf0f8ff); // Fundo azul bem clarinho
-
-        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 5, 20);
+        scene.background = new THREE.Color(0xbae6fd);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
         renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.outputEncoding = THREE.sRGBEncoding;
         document.body.appendChild(renderer.domElement);
 
-        // Controles para girar a cena com o mouse/toque
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 5, 28);
+
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
 
-        // 2. ILUMINAÇÃO
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        scene.add(ambientLight);
-
+        // ILUMINAÇÃO COMPOSTA
+        scene.add(new THREE.AmbientLight(0xffffff, 0.7));
         const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
         dirLight.position.set(10, 20, 15);
         dirLight.castShadow = true;
         scene.add(dirLight);
 
-        // 3. CONSTRUÇÃO DO ÁBACO
+        // TEXTURAS PBR
+        const texLoader = new THREE.TextureLoader();
+        const woodTex = texLoader.load('https://threejs.org/examples/textures/hardwood2_diffuse.jpg');
+        const woodBump = texLoader.load('https://threejs.org/examples/textures/hardwood2_bump.jpg');
+        const woodMat = new THREE.MeshStandardMaterial({ map: woodTex, bumpMap: woodBump, bumpScale: 0.05, roughness: 0.8 });
+        const rodMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.9, roughness: 0.1 });
 
-        // Material da Moldura (Madeira)
-        const frameMaterial = new THREE.MeshStandardMaterial({ color: 0x8B5A2B, roughness: 0.7 });
-        const rodMaterial = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.8, roughness: 0.2 });
-
-        // Grupo principal para organizar o ábaco
-        const abacusGroup = new THREE.Scene();
-        scene.add(abacusGroup);
-
-        // Moldura: Base inferior e superior
+        // ESTRUTURA
         const createBox = (w, h, d, x, y, z) => {
-            const geo = new THREE.BoxGeometry(w, h, d);
-            const mesh = new THREE.Mesh(geo, frameMaterial);
-            mesh.position.set(x, y, z);
-            mesh.castShadow = true;
-            mesh.receiveShadow = true;
-            abacusGroup.add(mesh);
+            const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), woodMat);
+            m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true;
+            scene.add(m);
         };
+        createBox(17, 1.2, 3, 0, -5.5, 0); createBox(17, 1.2, 3, 0, 5.5, 0);
+        createBox(1.2, 12, 3, -9.1, 0, 0); createBox(1.2, 12, 3, 9.1, 0, 0);
 
-        createBox(16, 0.8, 2, 0, -5, 0);  // Base inferior
-        createBox(16, 0.8, 2, 0, 5, 0);   // Base superior
-        createBox(0.8, 10, 2, -7.6, 0, 0); // Lateral esquerda
-        createBox(0.8, 10, 2, 7.6, 0, 0);  // Lateral direita
-
-        // Configuração das Hastes e Cores para as Crianças
-        // Cores vibrantes ajudam a memorizar: Unidade, Dezena, Centena...
-        const rodConfigs = [
-            { x: 5.5, color: 0xff3333 },  // Unidades (Vermelho)
-            { x: 2.75, color: 0x33cc33 }, // Dezenas (Verde)
-            { x: 0, color: 0x3366ff },    // Centenas (Azul)
-            { x: -2.75, color: 0xffcc00 },// Unidades de Milhar (Amarelo)
-            { x: -5.5, color: 0xff8800 }  // Dezenas de Milhar (Laranja)
+        const rodsConfig = [
+            { label: 'DM', x: -6, color: 0xd500f9, val: 10000 },
+            { label: 'UM', x: -3, color: 0xffab00, val: 1000 },
+            { label: 'C',  x: 0,  color: 0x00e5ff, val: 100 },
+            { label: 'D',  x: 3,  color: 0x00e676, val: 10 },
+            { label: 'U',  x: 6,  color: 0xff1744, val: 1 }
         ];
 
-        const beads = []; // Lista para armazenar as contas e animá-las
+        // TEXTO 3D EM PRETO
+        const fontLoader = new THREE.FontLoader();
+        fontLoader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/gentilis_bold.typeface.json', (font) => {
+            // Material preto para alto contraste
+            const textMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.5, metalness: 0.1 });
 
-        rodConfigs.forEach(config => {
-            // Criar a haste cilíndrica
-            const rodGeo = new THREE.CylinderGeometry(0.1, 0.1, 10, 16);
-            const rodMesh = new THREE.Mesh(rodGeo, rodMaterial);
-            rodMesh.position.set(config.x, 0, 0);
-            abacusGroup.add(rodMesh);
+            // 1. TÍTULO SUPERIOR
+            const titleGeo = new THREE.TextGeometry('ABACO INTERATIVO', { font: font, size: 0.8, height: 0.2 });
+            titleGeo.computeBoundingBox();
+            const titleOffset = -0.5 * (titleGeo.boundingBox.max.x - titleGeo.boundingBox.min.x);
+            const titleMesh = new THREE.Mesh(titleGeo, textMat);
+            titleMesh.position.set(titleOffset, 6.3, 0);
+            scene.add(titleMesh);
 
-            // Criar 10 contas (beads) por haste
-            const beadMaterial = new THREE.MeshStandardMaterial({ 
-                color: config.color, 
-                roughness: 0.3,
-                metalness: 0.1
+            // 2. RÓTULOS DAS COLUNAS
+            rodsConfig.forEach(cfg => {
+                const lblGeo = new THREE.TextGeometry(cfg.label, { font: font, size: 0.6, height: 0.1 });
+                lblGeo.computeBoundingBox();
+                const centerOffset = -0.5 * (lblGeo.boundingBox.max.x - lblGeo.boundingBox.min.x);
+                const lblMesh = new THREE.Mesh(lblGeo, textMat);
+                lblMesh.position.set(cfg.x + centerOffset, -5.7, 1.55);
+                scene.add(lblMesh);
             });
-
-            // Usando formato de "donut" (Torus) para as contas
-            const beadGeo = new THREE.TorusGeometry(0.5, 0.2, 16, 32);
-
-            for (let i = 0; i < 10; i++) {
-                const beadMesh = new THREE.Mesh(beadGeo, beadMaterial);
-                
-                // Rotaciona o donut para deitar na haste
-                beadMesh.rotation.x = Math.PI / 2; 
-                
-                // Posição inicial (empilhadas na parte de baixo)
-                // Calculamos o espaço para que caibam perfeitamente
-                const startY = -4.3 + (i * 0.45); 
-                beadMesh.position.set(config.x, startY, 0);
-                beadMesh.castShadow = true;
-
-                // Propriedades customizadas para a lógica de movimento
-                beadMesh.userData = {
-                    rodIndex: config.x,
-                    isUp: false,
-                    targetY: startY,
-                    bottomY: startY,
-                    topY: 4.3 - ((9 - i) * 0.45) // Posição correspondente no topo
-                };
-
-                abacusGroup.add(beadMesh);
-                beads.push(beadMesh);
-            }
         });
 
-        // 4. INTERATIVIDADE (Cliques com Raycaster)
+        // MODELO EXTERNO
+        let duckModel = null;
+        let duckJumpTarget = -5.5;
+        new THREE.GLTFLoader().load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/models/gltf/Duck/glTF-Binary/Duck.glb', (gltf) => {
+            duckModel = gltf.scene;
+            duckModel.position.set(-11.5, -5.5, 5.0);
+            duckModel.scale.set(2.2, 2.2, 2.2);
+            duckModel.rotation.y = Math.PI * 1.5;
+            duckModel.traverse(n => { if(n.isMesh) n.castShadow = true; });
+            scene.add(duckModel);
+        });
+
+        // PEÇAS
+        const allBeads = [];
+        const rodGroups = [];
+        rodsConfig.forEach(cfg => {
+            const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 11), rodMat);
+            rod.position.x = cfg.x; scene.add(rod);
+            const group = [];
+            for(let i=0; i<10; i++){
+                const bead = new THREE.Mesh(new THREE.TorusGeometry(0.75, 0.25, 20, 32), 
+                             new THREE.MeshStandardMaterial({ color: cfg.color, metalness: 0.4, roughness: 0.3 }));
+                bead.rotation.x = Math.PI/2; bead.castShadow = true;
+                const startY = -4.5 + (i * 0.6);
+                bead.position.set(cfg.x, startY, 0);
+                bead.userData = { isUp: false, val: cfg.val, bottomY: startY, topY: 4.5 - ((9 - i) * 0.6), targetY: startY };
+                allBeads.push(bead); group.push(bead); scene.add(bead);
+            }
+            rodGroups.push(group);
+        });
+
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
-
-        window.addEventListener('click', (event) => {
-            // Converte a posição do clique para coordenadas normalizadas (-1 a +1)
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
+        window.addEventListener('pointerdown', (e) => {
+            if (e.target.closest('#game-ui')) return;
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
-
-            // Verifica se clicou em alguma conta
-            const intersects = raycaster.intersectObjects(beads);
-
-            if (intersects.length > 0) {
-                const clickedBead = intersects[0].object;
-                const data = clickedBead.userData;
-
-                // Alterna o estado de cima para baixo e define o novo alvo Y
-                data.isUp = !data.isUp;
-                data.targetY = data.isUp ? data.topY : data.bottomY;
+            const hits = raycaster.intersectObjects(allBeads);
+            if (hits.length > 0) {
+                const b = hits[0].object;
+                b.userData.isUp = !b.userData.isUp;
+                b.userData.targetY = b.userData.isUp ? b.userData.topY : b.userData.bottomY;
+            }
+            if (duckModel && raycaster.intersectObject(duckModel, true).length > 0) {
+                document.getElementById('quack-sound').play().catch(()=>{});
+                duckJumpTarget = -4.0; setTimeout(() => duckJumpTarget = -5.5, 150);
             }
         });
 
-        // Ajusta a tela ao redimensionar a janela
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+        window.checkResult = () => {
+            const val = document.getElementById('user-input').value;
+            if (val === "") return;
+            const user = parseInt(val);
+            const real = allBeads.reduce((a, b) => b.userData.isUp ? a + b.userData.val : a, 0);
+            document.getElementById('feedback').innerHTML = (user === real) ? 
+                "<span style='color:#10b981'>Correto! 🌟</span>" : "<span style='color:#ef4444'>Tente de novo! 💪</span>";
+        };
 
-        // 5. LOOP DE ANIMAÇÃO
+        window.generateChallenge = () => {
+            document.getElementById('user-input').value = "";
+            rodGroups.forEach(group => {
+                const count = Math.floor(Math.random() * 10);
+                group.forEach((b, i) => {
+                    const up = i >= (10 - count);
+                    b.userData.isUp = up; b.userData.targetY = up ? b.userData.topY : b.userData.bottomY;
+                });
+            });
+        };
+
+        window.resetAbacus = () => allBeads.forEach(b => { b.userData.isUp = false; b.userData.targetY = b.userData.bottomY; });
+
         function animate() {
             requestAnimationFrame(animate);
-
-            // Suaviza o movimento das contas até o targetY (efeito de deslizar)
-            beads.forEach(bead => {
-                if (Math.abs(bead.position.y - bead.userData.targetY) > 0.01) {
-                    bead.position.y += (bead.userData.targetY - bead.position.y) * 0.1;
-                }
-            });
-
-            controls.update();
-            renderer.render(scene, camera);
+            allBeads.forEach(b => b.position.y += (b.userData.targetY - b.position.y) * 0.15);
+            if (duckModel) duckModel.position.y += (duckJumpTarget - duckModel.position.y) * 0.2;
+            controls.update(); renderer.render(scene, camera);
         }
-
         animate();
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>
