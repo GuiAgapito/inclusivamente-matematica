@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ábaco 3D Interativo</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #87CEEB; /* Céu azul suave, amigável para crianças */
+            font-family: sans-serif;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            color: #333;
+            pointer-events: none;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 0;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="info">Ábaco 3D: Clique nas pecinhas para mover e arraste a tela para girar!</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // 1. CONFIGURAÇÃO BÁSICA (Cena, Câmera e Renderizador)
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xf0f8ff); // Fundo azul bem clarinho
+
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 5, 20);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        document.body.appendChild(renderer.domElement);
+
+        // Controles para girar a cena com o mouse/toque
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        // 2. ILUMINAÇÃO
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(10, 20, 15);
+        dirLight.castShadow = true;
+        scene.add(dirLight);
+
+        // 3. CONSTRUÇÃO DO ÁBACO
+
+        // Material da Moldura (Madeira)
+        const frameMaterial = new THREE.MeshStandardMaterial({ color: 0x8B5A2B, roughness: 0.7 });
+        const rodMaterial = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.8, roughness: 0.2 });
+
+        // Grupo principal para organizar o ábaco
+        const abacusGroup = new THREE.Scene();
+        scene.add(abacusGroup);
+
+        // Moldura: Base inferior e superior
+        const createBox = (w, h, d, x, y, z) => {
+            const geo = new THREE.BoxGeometry(w, h, d);
+            const mesh = new THREE.Mesh(geo, frameMaterial);
+            mesh.position.set(x, y, z);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            abacusGroup.add(mesh);
+        };
+
+        createBox(16, 0.8, 2, 0, -5, 0);  // Base inferior
+        createBox(16, 0.8, 2, 0, 5, 0);   // Base superior
+        createBox(0.8, 10, 2, -7.6, 0, 0); // Lateral esquerda
+        createBox(0.8, 10, 2, 7.6, 0, 0);  // Lateral direita
+
+        // Configuração das Hastes e Cores para as Crianças
+        // Cores vibrantes ajudam a memorizar: Unidade, Dezena, Centena...
+        const rodConfigs = [
+            { x: 5.5, color: 0xff3333 },  // Unidades (Vermelho)
+            { x: 2.75, color: 0x33cc33 }, // Dezenas (Verde)
+            { x: 0, color: 0x3366ff },    // Centenas (Azul)
+            { x: -2.75, color: 0xffcc00 },// Unidades de Milhar (Amarelo)
+            { x: -5.5, color: 0xff8800 }  // Dezenas de Milhar (Laranja)
+        ];
+
+        const beads = []; // Lista para armazenar as contas e animá-las
+
+        rodConfigs.forEach(config => {
+            // Criar a haste cilíndrica
+            const rodGeo = new THREE.CylinderGeometry(0.1, 0.1, 10, 16);
+            const rodMesh = new THREE.Mesh(rodGeo, rodMaterial);
+            rodMesh.position.set(config.x, 0, 0);
+            abacusGroup.add(rodMesh);
+
+            // Criar 10 contas (beads) por haste
+            const beadMaterial = new THREE.MeshStandardMaterial({ 
+                color: config.color, 
+                roughness: 0.3,
+                metalness: 0.1
+            });
+
+            // Usando formato de "donut" (Torus) para as contas
+            const beadGeo = new THREE.TorusGeometry(0.5, 0.2, 16, 32);
+
+            for (let i = 0; i < 10; i++) {
+                const beadMesh = new THREE.Mesh(beadGeo, beadMaterial);
+                
+                // Rotaciona o donut para deitar na haste
+                beadMesh.rotation.x = Math.PI / 2; 
+                
+                // Posição inicial (empilhadas na parte de baixo)
+                // Calculamos o espaço para que caibam perfeitamente
+                const startY = -4.3 + (i * 0.45); 
+                beadMesh.position.set(config.x, startY, 0);
+                beadMesh.castShadow = true;
+
+                // Propriedades customizadas para a lógica de movimento
+                beadMesh.userData = {
+                    rodIndex: config.x,
+                    isUp: false,
+                    targetY: startY,
+                    bottomY: startY,
+                    topY: 4.3 - ((9 - i) * 0.45) // Posição correspondente no topo
+                };
+
+                abacusGroup.add(beadMesh);
+                beads.push(beadMesh);
+            }
+        });
+
+        // 4. INTERATIVIDADE (Cliques com Raycaster)
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        window.addEventListener('click', (event) => {
+            // Converte a posição do clique para coordenadas normalizadas (-1 a +1)
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            // Verifica se clicou em alguma conta
+            const intersects = raycaster.intersectObjects(beads);
+
+            if (intersects.length > 0) {
+                const clickedBead = intersects[0].object;
+                const data = clickedBead.userData;
+
+                // Alterna o estado de cima para baixo e define o novo alvo Y
+                data.isUp = !data.isUp;
+                data.targetY = data.isUp ? data.topY : data.bottomY;
+            }
+        });
+
+        // Ajusta a tela ao redimensionar a janela
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // 5. LOOP DE ANIMAÇÃO
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Suaviza o movimento das contas até o targetY (efeito de deslizar)
+            beads.forEach(bead => {
+                if (Math.abs(bead.position.y - bead.userData.targetY) > 0.01) {
+                    bead.position.y += (bead.userData.targetY - bead.position.y) * 0.1;
+                }
+            });
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+</html>

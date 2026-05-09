@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InclusivaMente Matemática</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* 🔵 PALETA PRINCIPAL - CONSCIENTIZAÇÃO DO AUTISMO */
+    --accent: #1E88E5;       /* Azul Vivo Principal */
+    --accent-hover: #1565C0; 
+    --accent2: #FFCA28;      /* Amarelo Ouro (do quebra-cabeça) */
+    
+    /* 🎨 CORES DE APOIO (Neurodiversidade) */
+    --teal: #26A69A;         /* Verde */
+    --teal-light: #E0F2F1;
+    --purple: #7E57C2;       /* Roxo */
+    --purple-light: #EDE7F6;
+    --red: #EF5350;          /* Vermelho */
+    --red-light: #FDECEA;
+
+    /* ⚪ FUNDOS E TEXTOS */
+    --bg: #F0F4F8;           /* Fundo levemente azulado/acinzentado */
+    --bg2: #E1E8F0;
+    --ink: #1C1A17;
+    --ink2: #455A64;
+    --ink3: #90A4AE;
+    
+    --border: rgba(30, 136, 229, 0.12);
+    --border-strong: rgba(30, 136, 229, 0.22);
+    --radius: 20px;
+    --radius-sm: 10px;
+}
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ── */
+  header {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header-bg {
+    position: absolute;
+    inset: 0;
+    background: var(--ink);
+    z-index: 0;
+  }
+
+  .header-bg::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    right: -10%;
+    width: 700px;
+    height: 700px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.18;
+  }
+
+  .header-bg::after {
+    content: '';
+    position: absolute;
+    bottom: -10%;
+    left: -5%;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: var(--teal);
+    opacity: 0.15;
+  }
+
+  .dots-grid {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size: 32px 32px;
+    z-index: 1;
+  }
+
+  nav {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2rem 5%;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+  }
+
+  .logo-mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .logo-mark svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+  }
+
+  .logo-text span {
+    display: block;
+    font-weight: 400;
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: rgba(255,255,255,0.65);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: #fff; }
+
+  .hero-content {
+    position: relative;
+    z-index: 10;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 5%;
+    padding-bottom: 6rem;
+    padding-top: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 1.8rem;
+    width: fit-content;
+  }
+
+  .hero-tag::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent2);
+    flex-shrink: 0;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(48px, 7vw, 88px);
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-size: clamp(16px, 1.8vw, 19px);
+    color: rgba(255,255,255,0.6);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 2.5rem;
+    font-weight: 300;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 100px;
+    padding: 14px 28px;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.2s, background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-primary:hover { background: #d04516; transform: translateY(-1px); }
+
+  .btn-secondary {
+    background: transparent;
+    color: rgba(255,255,255,0.8);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 100px;
+    padding: 14px 28px;
+    font-size: 15px;
+    font-weight: 400;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+
+  .hero-badges {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    gap: 1rem;
+    padding: 0 5% 2.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .badge-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── SECTION GENERIC ── */
+  .section {
+    padding: 7rem 5%;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-full {
+    padding: 7rem 5%;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(30px, 4vw, 46px);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.2rem;
+  }
+
+  .section-body {
+    font-size: 17px;
+    color: var(--ink2);
+    line-height: 1.8;
+    max-width: 680px;
+  }
+
+  /* ── ABOUT ── */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: center;
+  }
+
+  .about-features {
+    margin-top: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .feature-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 16px;
+  }
+
+  .feature-text strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+
+  .feature-text p {
+    font-size: 14px;
+    color: var(--ink2);
+    line-height: 1.5;
+  }
+
+  .about-visual {
+    position: relative;
+  }
+
+  .about-card-main {
+    background: var(--ink);
+    border-radius: 20px;
+    padding: 2.5rem;
+    color: #fff;
+  }
+
+  .about-card-main .card-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 1rem;
+  }
+
+  .about-card-main h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    color: #fff;
+  }
+
+  .tech-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 1.5rem;
+  }
+
+  .tech-pill {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 100px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .float-card {
+    position: absolute;
+    background: #fff;
+    border-radius: 14px;
+    padding: 14px 18px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.14);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .float-card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .float-card-1 {
+    bottom: -24px;
+    right: -20px;
+    background: var(--accent);
+    color: #fff;
+    padding: 16px 22px;
+  }
+
+  .float-card-1 .f-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .float-card-1 .f-label {
+    font-size: 11px;
+    opacity: 0.8;
+    margin-top: 2px;
+  }
+
+  /* ── PSICOPEDAGOGA ── */
+  .expert-section {
+    background: var(--bg2);
+  }
+
+  .expert-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 7rem 5%;
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 5rem;
+    align-items: center;
+  }
+
+  .expert-photo-wrap {
+    position: relative;
+  }
+
+  .expert-photo {
+    width: 100%;
+    aspect-ratio: 3/4;
+    border-radius: 20px;
+    background: var(--ink);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .photo-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 2rem;
+    background: linear-gradient(160deg, #2a3a5c 0%, #1C1A17 100%);
+  }
+
+  .photo-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    border: 2px solid rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+  }
+
+  .photo-avatar svg {
+    width: 50px;
+    height: 50px;
+    opacity: 0.6;
+  }
+
+  .photo-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .photo-role {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+  }
+
+  .expert-badge-float {
+    position: absolute;
+    top: -16px;
+    right: -16px;
+    background: var(--teal);
+    color: #fff;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .quote-block {
+    border-left: 3px solid var(--accent);
+    padding: 1.5rem 2rem;
+    background: #fff;
+    border-radius: 0 12px 12px 0;
+    margin: 2rem 0;
+  }
+
+  .quote-block p {
+    font-size: 18px;
+    font-style: italic;
+    color: var(--ink);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* ── MÓDULOS 3D ── */
+  .modules-bg {
+    background: var(--ink);
+  }
+
+  .modules-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 7rem 5%;
+  }
+
+  .modules-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .modules-header .section-label {
+    color: var(--accent2);
+  }
+
+  .modules-header .section-title {
+    color: #fff;
+  }
+
+  .modules-header .section-body {
+    color: rgba(255,255,255,0.5);
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .modules-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  /* main block */
+  .module-block {
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .module-header {
+    padding: 2rem 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+  }
+
+  .module-icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 24px;
+  }
+
+  .module-title-group h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .module-title-group p {
+    font-size: 13px;
+    line-height: 1.4;
+    margin-top: 2px;
+    opacity: 0.7;
+  }
+
+  .module-badge {
+    margin-left: auto;
+    background: rgba(255,255,255,0.1);
+    border-radius: 100px;
+    padding: 4px 12px;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+  }
+
+  .submodules-grid {
+    display: grid;
+    padding: 2rem;
+    gap: 1rem;
+  }
+
+  .submodule-card {
+    border-radius: 14px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .submodule-card:hover { transform: translateY(-6px); }
+
+  .submodule-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin-bottom: 0.5rem;
+  }
+
+  .submodule-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 0.5rem;
+  }
+
+  .submodule-desc {
+    font-size: 13px;
+    line-height: 1.6;
+    opacity: 0.75;
+  }
+
+  .submodule-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 1rem;
+    background: rgba(255,255,255,0.15);
+    border-radius: 100px;
+    padding: 4px 10px;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+  }
+
+  /* block 1: contagem - teal */
+  .block-contagem { background: rgba(29,158,117,0.12); }
+  .block-contagem .module-header { background: rgba(29,158,117,0.2); }
+  .block-contagem .module-icon-wrap { background: var(--teal); }
+  .block-contagem .module-title-group h2 { color: #9FE1CB; }
+  .block-contagem .module-title-group p { color: #9FE1CB; }
+  .block-contagem .module-badge { color: #9FE1CB; }
+  .block-contagem .submodules-grid { grid-template-columns: 1fr 1fr; }
+  .sub-teal { background: rgba(29,158,117,0.22); color: #E1F5EE; }
+  .sub-teal .submodule-num { color: #9FE1CB; }
+  .sub-teal .submodule-title { color: #E1F5EE; }
+
+  /* block 2: operações - amber */
+  .block-operacoes { background: rgba(186,117,23,0.12); }
+  .block-operacoes .module-header { background: rgba(186,117,23,0.2); }
+  .block-operacoes .module-icon-wrap { background: var(--amber); }
+  .block-operacoes .module-title-group h2 { color: #FAC775; }
+  .block-operacoes .module-title-group p { color: #FAC775; }
+  .block-operacoes .module-badge { color: #FAC775; }
+  .block-operacoes .submodules-grid { grid-template-columns: 1fr 1fr; }
+  .sub-amber { background: rgba(186,117,23,0.22); color: #FAEEDA; }
+  .sub-amber .submodule-num { color: #FAC775; }
+  .sub-amber .submodule-title { color: #FAEEDA; }
+
+  /* block 3: geometria - purple */
+  .block-geometria { background: rgba(83,74,183,0.12); }
+  .block-geometria .module-header { background: rgba(83,74,183,0.2); }
+  .block-geometria .module-icon-wrap { background: var(--purple); }
+  .block-geometria .module-title-group h2 { color: #AFA9EC; }
+  .block-geometria .module-title-group p { color: #AFA9EC; }
+  .block-geometria .module-badge { color: #AFA9EC; }
+  .block-geometria .submodules-grid { grid-template-columns: 1fr 1fr; }
+  .sub-purple { background: rgba(83,74,183,0.22); color: #EEEDFE; }
+  .sub-purple .submodule-num { color: #AFA9EC; }
+  .sub-purple .submodule-title { color: #EEEDFE; }
+
+  /* ── EQUIPE ── */
+  .team-section { background: var(--bg2); }
+  .team-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 7rem 5%;
+  }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 3rem;
+  }
+
+  .team-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    border: 1px solid var(--border);
+    transition: transform 0.2s;
+    text-decoration: none;
+  }
+
+  .team-card:hover { transform: translateY(-2px); }
+
+  .team-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin: 0 auto 0.75rem;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+  }
+
+  .team-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+
+  .team-role {
+    font-size: 11px;
+    color: var(--ink3);
+    line-height: 1.4;
+  }
+
+  /* ── TECH STACK ── */
+  .tech-section {
+    padding: 5rem 5%;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-top: 2.5rem;
+  }
+
+  .tech-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .tech-card:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+
+  .tech-card-icon {
+    font-size: 28px;
+    margin-bottom: 0.75rem;
+  }
+
+  .tech-card h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .tech-card p {
+    font-size: 12px;
+    color: var(--ink3);
+    line-height: 1.4;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink);
+    color: rgba(255,255,255,0.5);
+    padding: 4rem 5% 2.5rem;
+  }
+
+  .footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .footer-top {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 4rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 2rem;
+  }
+
+  .footer-brand .logo-text {
+    font-size: 16px;
+  }
+
+  .footer-desc {
+    font-size: 14px;
+    color: rgba(255,255,255,0.4);
+    line-height: 1.7;
+    margin-top: 1rem;
+    max-width: 280px;
+  }
+
+  .footer-col h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.8);
+    letter-spacing: 0.04em;
+    margin-bottom: 1rem;
+  }
+
+  .footer-col ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .footer-col ul li a {
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+  }
+
+  .footer-col ul li a:hover { color: rgba(255,255,255,0.8); }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-copy {
+    font-size: 13px;
+    color: rgba(255,255,255,0.3);
+  }
+
+  .footer-tags {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .footer-tag {
+    background: rgba(255,255,255,0.06);
+    border-radius: 100px;
+    padding: 4px 12px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+  }
+
+  /* ── SEPARATOR ── */
+  .separator {
+    height: 1px;
+    background: var(--border);
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .about-visual { display: none; }
+    .expert-inner { grid-template-columns: 1fr; gap: 3rem; }
+    .expert-photo { aspect-ratio: 1/1; }
+    .footer-top { grid-template-columns: 1fr; gap: 2rem; }
+    .block-contagem .submodules-grid,
+    .block-operacoes .submodules-grid,
+    .block-geometria .submodules-grid { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-tag  { animation: fadeUp 0.6s ease both; }
+  h1         { animation: fadeUp 0.6s 0.1s ease both; }
+  .hero-sub  { animation: fadeUp 0.6s 0.2s ease both; }
+  .hero-cta  { animation: fadeUp 0.6s 0.3s ease both; }
+  .hero-badges { animation: fadeUp 0.6s 0.4s ease both; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     HEADER / HERO
+══════════════════════════════════════════════ -->
+<header>
+  <div class="header-bg"></div>
+  <div class="dots-grid"></div>
+
+  <nav>
+    <a href="#" class="nav-logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="9" height="9" rx="2" fill="white" fill-opacity="0.9"/>
+          <rect x="15" y="2" width="9" height="9" rx="2" fill="white" fill-opacity="0.5"/>
+          <rect x="2" y="15" width="9" height="9" rx="2" fill="white" fill-opacity="0.5"/>
+          <path d="M17 19 L22 19 M19.5 16.5 L19.5 21.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        InclusivaMente
+        <span>Matemática</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#sobre">Sobre</a></li>
+      <li><a href="#especialista">Especialista</a></li>
+      <li><a href="#modulos">Módulos 3D</a></li>
+      <li><a href="#equipe">Equipe</a></li>
+    </ul>
+  </nav>
+
+  <div class="hero-content">
+    <div class="hero-tag">Computação Gráfica · UFC Sobral · 2026.1</div>
+    <h1>Matemática que<br><em>todo mundo</em><br>consegue ver.</h1>
+    <p class="hero-sub">
+      Um ambiente 3D interativo para o ensino de matemática básica desenvolvido especialmente para alunos neurodivergentes — aprender pelo olhar, tocar e explorar.
+    </p>
+    <div class="hero-cta">
+      <a href="#modulos" class="btn-primary">
+        Explorar módulos
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="#sobre" class="btn-secondary">Saber mais</a>
+    </div>
+  </div>
+
+  <div class="hero-badges">
+    <div class="badge"><div class="badge-dot" style="background:#1D9E75"></div>WebGL / Three.js</div>
+    <div class="badge"><div class="badge-dot" style="background:#F5A623"></div>Modelos .glb / .gltf</div>
+    <div class="badge"><div class="badge-dot" style="background:#AFA9EC"></div>Iluminação com sombras</div>
+    <div class="badge"><div class="badge-dot" style="background:#E8521A"></div>Interatividade 3D</div>
+    <div class="badge"><div class="badge-dot" style="background:#85B7EB"></div>Acessível & Inclusivo</div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════
+     SOBRE O PROJETO
+══════════════════════════════════════════════ -->
+<section id="sobre" class="section">
+  <div class="about-grid">
+    <div>
+      <p class="section-label">Sobre o projeto</p>
+      <h2 class="section-title">Tecnologia a serviço da inclusão educacional</h2>
+      <p class="section-body">
+        O <strong>InclusivaMente Matemática</strong> nasce da interseção entre Computação Gráfica e pedagogia inclusiva. Muitos alunos neurodivergentes — com TDAH, dislexia, autismo ou discalculia — encontram barreiras significativas no ensino tradicional de matemática, baseado em abstração precoce e recursos essencialmente textuais.
+      </p>
+      <p class="section-body" style="margin-top:1rem;">
+        Nossa solução propõe ambientes tridimensionais e interativos onde o aluno pode <em>ver</em> os números em um ábaco, <em>montar</em> operações com blocos do material dourado, <em>arrastar</em> palitos para entender divisão e <em>girar</em> sólidos geométricos para compreender suas propriedades — tudo no navegador, sem instalação.
+      </p>
+
+      <div class="about-features">
+        <div class="feature-item">
+          <div class="feature-icon" style="background:#E1F5EE;">🧩</div>
+          <div class="feature-text">
+            <strong>Aprendizagem multissensorial</strong>
+            <p>Interação visual e espacial que vai além do texto e do quadro-negro.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon" style="background:#FAEEDA;">🎨</div>
+          <div class="feature-text">
+            <strong>Design acessível</strong>
+            <p>Paleta de cores cuidadosa, contraste adequado e navegação intuitiva.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon" style="background:#EEEDFE;">🌐</div>
+          <div class="feature-text">
+            <strong>100% no navegador</strong>
+            <p>WebGL com Three.js — sem instalações, acessível de qualquer dispositivo.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-visual">
+      <div class="about-card-main">
+        <p class="card-label">Requisitos técnicos</p>
+        <h3>Computação Gráfica como interface primária</h3>
+        <p style="color:rgba(255,255,255,0.55); font-size:14px; line-height:1.6;">
+          A cena 3D renderizada no canvas WebGL é o núcleo da experiência — não um complemento. Cada módulo pedagógico é construído sobre geometrias, luzes e materiais em Three.js.
+        </p>
+        <div class="tech-pills">
+          <span class="tech-pill">Three.js</span>
+          <span class="tech-pill">OrbitControls</span>
+          <span class="tech-pill">Raycasting</span>
+          <span class="tech-pill">AmbientLight</span>
+          <span class="tech-pill">DirectionalLight</span>
+          <span class="tech-pill">Sombras ativas</span>
+          <span class="tech-pill">PBR Materials</span>
+          <span class="tech-pill">.glb / .gltf</span>
+        </div>
+      </div>
+      <div class="float-card float-card-1">
+        <div>
+          <div class="f-num">8</div>
+          <div class="f-label">módulos interativos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="separator"></div>
+
+<!-- ══════════════════════════════════════════════
+     ESPECIALISTA / PSICOPEDAGOGA
+══════════════════════════════════════════════ -->
+<section id="especialista" class="expert-section">
+  <div class="expert-inner">
+    <!-- FOTO -->
+    <div class="expert-photo-wrap">
+      <a href="https://www.instagram.com/valentinasanxo_terap?igsh=MW16OHo2dmp2aDU0bA==" target="_blank" class="expert-photo">
+        <div class="photo-real" style="position: relative; border-radius: 20px; overflow: hidden;">
+          <img src="assets/IMG_3609.jpeg" 
+               alt="Valentina" 
+               style="width: 100%; display: block; aspect-ratio: 3/4; object-fit: cover;">
+          <!-- OVERLAY (nome sobre a imagem) -->
+          <div class="photo-overlay" style="position: absolute; bottom: 0; left: 0; width: 100%; padding: 30px 15px 15px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); color: white; text-align: left; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
+            <div class="photo-name" style="font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 4px;">Valentina Sanxo</div>
+            <div class="photo-role" style="font-size: 0.75rem; opacity: 0.9;">Psicopedagoga · Consultora do Projeto</div>
+          </div>
+        </div>
+      </a>
+      <div class="expert-badge-float">Especialista convidada</div>
+    </div>
+
+    <!-- TEXTO AO LADO -->
+    <div>
+      <p class="section-label">Perspectiva especializada</p>
+      <h2 class="section-title">Por que isso importa no ensino inclusivo?</h2>
+
+      <div class="quote-block">
+        <p>"Alunos neurodivergentes não têm dificuldade com a matemática em si — têm dificuldade com a forma como ela é apresentada. Quando oferecemos representações concretas, visuais e interativas, derrubamos a barreira entre o abstrato e o compreensível."</p>
+      </div>
+
+      <p class="section-body">
+        Estudantes com TDAH, TEA, dislexia e discalculia frequentemente possuem inteligência preservada, mas processam informação de formas distintas. O ensino convencional, centrado em abstração simbólica prematura, cria obstáculos desnecessários.
+      </p>
+      <p class="section-body" style="margin-top:1rem;">
+        Ferramentas como o material dourado, o ábaco e a representação concreta das operações não são "facilitações" — são metodologias pedagogicamente fundamentadas e reconhecidas na literatura especializada. O <strong>InclusivaMente Matemática</strong> digitaliza e democratiza essas abordagens, tornando-as acessíveis e envolventes por meio da tecnologia 3D.
+      </p>
+      <p class="section-body" style="margin-top:1rem;">
+        A experiência imersiva e a possibilidade de interação direta com os objetos virtuais ativa múltiplas áreas cognitivas simultaneamente, favorecendo a consolidação do aprendizado e a autoconfiança dos estudantes.
+      </p>
+
+      <!-- 🔢 INDICADORES ESTATÍSTICOS -->
+      <div style="display:flex; gap:2rem; margin-top:2rem; flex-wrap:wrap;">
+        <div>
+          <div style="font-family:'Syne',sans-serif; font-size:28px; font-weight:800; color:var(--accent);">23%</div>
+          <div style="font-size:12px; color:var(--ink2);">dos estudantes têm<br>alguma neurodivergência</div>
+        </div>
+        <div>
+          <div style="font-family:'Syne',sans-serif; font-size:28px; font-weight:800; color:var(--teal);">3×</div>
+          <div style="font-size:12px; color:var(--ink2);">mais retenção com<br>aprendizado multissensorial</div>
+        </div>
+        <div>
+          <div style="font-family:'Syne',sans-serif; font-size:28px; font-weight:800; color:var(--purple);">100%</div>
+          <div style="font-size:12px; color:var(--ink2);">acessível pelo<br>navegador</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     MÓDULOS 3D
+══════════════════════════════════════════════ -->
+<section id="modulos" class="modules-bg">
+  <div class="modules-inner">
+    <div class="modules-header">
+      <p class="section-label">Conteúdos interativos</p>
+      <h2 class="section-title" style="color:#fff;">Três blocos de aprendizagem</h2>
+      <p class="section-body">Cada bloco reúne módulos 3D específicos, com interatividade própria e objetivo pedagógico claro.</p>
+    </div>
+
+    <div class="modules-grid">
+
+      <!-- ── BLOCO 1: CONTAGEM ── -->
+      <div class="module-block block-contagem">
+        <div class="module-header">
+          <div class="module-icon-wrap">🧮</div>
+          <div class="module-title-group">
+            <h2>Princípios Fundamentais da Contagem</h2>
+            <p>Representação concreta dos números e do sistema posicional</p>
+          </div>
+          <div class="module-badge">2 módulos</div>
+        </div>
+        <div class="submodules-grid">
+          <div class="submodule-card sub-teal">
+            <div class="submodule-num">Módulo 01</div>
+            <div class="submodule-title">Dezena, Centena & Unidade</div>
+            <div class="submodule-desc">
+              Material dourado 3D: cubos (unidades), barras (dezenas) e placas (centenas) manipuláveis. Entenda o sistema posicional tocando e montando os blocos.
+            </div>
+            <div class="submodule-tag">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1.2"/><path d="M5 3v2l1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+              Material dourado · glb
+            </div>
+          </div>
+          <a href="implementacoes/abaco" target="_blank" class="submodule-card sub-teal">
+            <div class="submodule-num">Módulo 02</div>
+            <div class="submodule-title">Aprendendo a Contar com o Ábaco</div>
+            <div class="submodule-desc">
+              Ábaco 3D interativo com contas que se movem. Represente números, explore a ordem das dezenas e centenas e entenda a contagem de forma visual e lúdica.
+            </div>
+            <div class="submodule-tag">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1.2"/><path d="M5 3v2l1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+              Ábaco · glb · arrastar
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- ── BLOCO 2: OPERAÇÕES ── -->
+      <div class="module-block block-operacoes">
+        <div class="module-header">
+          <div class="module-icon-wrap">➕</div>
+          <div class="module-title-group">
+            <h2>Matemática Básica</h2>
+            <p>As quatro operações fundamentais com representação visual e interativa</p>
+          </div>
+          <div class="module-badge">4 módulos</div>
+        </div>
+        <div class="submodules-grid">
+          <div class="submodule-card sub-amber">
+            <div class="submodule-num">Módulo 03</div>
+            <div class="submodule-title">Soma</div>
+            <div class="submodule-desc">
+              Quadro interativo para adição com blocos arrastáveis. Visualize o agrupamento e o "vai-um" em 3D — sem abstrações prematuras.
+            </div>
+            <div class="submodule-tag">Quadro interativo · glb</div>
+          </div>
+          <div class="submodule-card sub-amber">
+            <div class="submodule-num">Módulo 04</div>
+            <div class="submodule-title">Subtração</div>
+            <div class="submodule-desc">
+              Arraste valores, "peça emprestado" e veja a operação acontecer. Cores e animações guiam o raciocínio de forma intuitiva.
+            </div>
+            <div class="submodule-tag">Pedir emprestado · raycasting</div>
+          </div>
+          <div class="submodule-card sub-amber">
+            <div class="submodule-num">Módulo 05</div>
+            <div class="submodule-title">Multiplicação</div>
+            <div class="submodule-desc">
+              Folha ilustrativa com contagem por grupos. Mudança de cor para identificar cada parcela — multiplicação como contagem agrupada.
+            </div>
+            <div class="submodule-tag">Textura · cores suaves</div>
+          </div>
+          <div class="submodule-card sub-amber">
+            <div class="submodule-num">Módulo 06</div>
+            <div class="submodule-title">Divisão</div>
+            <div class="submodule-desc">
+              Cones com palitos coloridos: retire e distribua os palitos entre os grupos. Veja o resto reservado em local específico — divisão com resto visualizada.
+            </div>
+            <div class="submodule-tag">Palitos · cones · arrastar</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BLOCO 3: GEOMETRIA ── -->
+      <div class="module-block block-geometria">
+        <div class="module-header">
+          <div class="module-icon-wrap">🔷</div>
+          <div class="module-title-group">
+            <h2>Geometria</h2>
+            <p>Formas planas e sólidos 3D — da planificação à visualização espacial</p>
+          </div>
+          <div class="module-badge">2 módulos</div>
+        </div>
+        <div class="submodules-grid">
+          <div class="submodule-card sub-purple">
+            <div class="submodule-num">Módulo 07</div>
+            <div class="submodule-title">Arestas, Vértices & Faces</div>
+            <div class="submodule-desc">
+              Explore sólidos 3D com destaque visual para cada elemento geométrico. Clique numa aresta, num vértice ou numa face e veja sua identificação — aprendizado por descoberta.
+            </div>
+            <div class="submodule-tag">Raycasting · seleção · cores</div>
+          </div>
+          <div class="submodule-card sub-purple">
+            <div class="submodule-num">Módulo 08</div>
+            <div class="submodule-title">Planificação & Sólidos 3D</div>
+            <div class="submodule-desc">
+              Triângulo/pirâmide, quadrado/cubo, retângulo/paralelepípedo, círculo/esfera, cilindro e cone. Veja a forma plana se dobrar e virar o sólido — e vice-versa.
+            </div>
+            <div class="submodule-tag">Animação · planificação · glb</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     TECNOLOGIAS
+══════════════════════════════════════════════ -->
+<section class="tech-section">
+  <p class="section-label">Stack técnico</p>
+  <h2 class="section-title">Construído com tecnologias modernas</h2>
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-card-icon">🌐</div>
+      <h4>Three.js</h4>
+      <p>Motor 3D principal via WebGL</p>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">📦</div>
+      <h4>.glb / .gltf</h4>
+      <p>Modelos externos com GLTFLoader</p>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">💡</div>
+      <h4>Iluminação PBR</h4>
+      <p>Ambient + Directional com sombras</p>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">🖱️</div>
+      <h4>Raycasting</h4>
+      <p>Clique e seleção de objetos 3D</p>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">🎨</div>
+      <h4>Blender</h4>
+      <p>Modelagem e texturização</p>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">🔄</div>
+      <h4>OrbitControls</h4>
+      <p>Câmera 3D interativa</p>
+    </div>
+  </div>
+</section>
+
+<div class="separator"></div>
+
+<!-- ══════════════════════════════════════════════
+     EQUIPE
+══════════════════════════════════════════════ -->
+<section id="equipe" class="team-section">
+  <div class="team-inner">
+    <p class="section-label">A equipe</p>
+    <h2 class="section-title">Quem fez acontecer</h2>
+    <p class="section-body">Estudantes de Engenharia de Computação da UFC Sobral, unindo computação gráfica e educação inclusiva.</p>
+
+    <div class="team-grid">
+      <a href="https://www.instagram.com/vitoria.pinia?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw%3D%3D" target="_blank"  class="team-card">
+        <img src="assets/vitoria.JPG" class="team-avatar" style="background:#1D9E75;">
+        <div class="team-name">Vitória Pinheiro</div>
+        <div class="team-role">Mult · Div · UX · Docs</div>
+      </a>
+      <a href="https://www.instagram.com/m_neto18/?utm_source=ig_web_button_share_sheet" target="_blank" class="team-card">
+        <img src="assets/martins.jpeg" class="team-avatar" style="background:#1D9E75;">
+        <div class="team-name">Antonio Martins</div>
+        <div class="team-role">Soma & Subtração</div>
+      </a>
+      <a href="" target="" class="team-card">
+        <img src="assets/debora.jpeg" class="team-avatar" style="background:#1D9E75;">
+        <div class="team-name">Débora Loiola</div>
+        <div class="team-role">Material Dourado</div>
+      </a>
+      <a href="https://www.instagram.com/diana_.melo/" target="_blank" class="team-card">
+        <img src="assets/diana.JPG" class="team-avatar" style="background:#1D9E75;">
+        <div class="team-name">Diana Melo</div>
+        <div class="team-role">Mult · Div · UX · Docs</div>
+      </a>
+      <a href="https://www.instagram.com/guiilherme.agapito/" target="_blank" class="team-card">
+        <img src="assets/agapitu.jpeg" class="team-avatar" style="background:#1D9E75;">
+        <div class="team-name">Guilherme Agapito</div>
+        <div class="team-role">Interatividade & Site</div>
+      </a>
+      <a href="https://www.instagram.com/gusttavoaragao__?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw%3D%3D" target="_blank" class="team-card">
+        <img src="assets/gustavo.jpeg" class="team-avatar" style="background:#1D9E75;">
+        <div class="team-name">Gustavo Aragão</div>
+        <div class="team-role">Formas Geométricas</div>
+      </a>
+      <a href="https://www.instagram.com/ricardo_coimbr?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw%3D%3D" target="_blank" class="team-card">
+        <img src="assets/ricardo.jpeg" class="team-avatar" style="background:#1D9E75;">
+        <div class="team-name">Ricardo Coimbra</div>
+        <div class="team-role">Ábaco 3D & Cena</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="nav-logo" style="margin-bottom:1rem;">
+          <div class="logo-mark">
+            <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="2" width="9" height="9" rx="2" fill="white" fill-opacity="0.9"/>
+              <rect x="15" y="2" width="9" height="9" rx="2" fill="white" fill-opacity="0.5"/>
+              <rect x="2" y="15" width="9" height="9" rx="2" fill="white" fill-opacity="0.5"/>
+              <path d="M17 19 L22 19 M19.5 16.5 L19.5 21.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="logo-text">
+            InclusivaMente
+            <span>Matemática</span>
+          </div>
+        </div>
+        <p class="footer-desc">Ambiente 3D interativo para o ensino de matemática básica voltado a alunos neurodivergentes. UFC Sobral · Computação Gráfica 2026.1.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Módulos</h4>
+        <ul>
+          <li><a href="#modulos">Contagem & Ábaco</a></li>
+          <li><a href="#modulos">Material Dourado</a></li>
+          <li><a href="#modulos">Soma & Subtração</a></li>
+          <li><a href="#modulos">Multiplicação</a></li>
+          <li><a href="#modulos">Divisão</a></li>
+          <li><a href="#modulos">Geometria</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Projeto</h4>
+        <ul>
+          <li><a href="#sobre">Sobre</a></li>
+          <li><a href="#especialista">Especialista</a></li>
+          <li><a href="#equipe">Equipe</a></li>
+          <li><a href="https://github.com" target="_blank">GitHub ↗</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2026 InclusivaMente Matemática · Universidade Federal do Ceará — Campus Sobral · Disciplina: Computação Gráfica · Prof. Dr. Iális Cavalcante</p>
+      <div class="footer-tags">
+        <span class="footer-tag">Three.js</span>
+        <span class="footer-tag">WebGL</span>
+        <span class="footer-tag">Educação Inclusiva</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

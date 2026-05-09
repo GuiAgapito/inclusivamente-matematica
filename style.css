@@ -1,0 +1,315 @@
+:root {
+  /* 🔵 PALETA CONSCIENTIZAÇÃO DO AUTISMO */
+  --kids-blue: #1E88E5;     /* Azul Principal */
+  --kids-yellow: #FFCA28;   /* Amarelo Ouro Vivo (Matemática) */
+  --kids-red: #EF5350;      /* Vermelho */
+  --kids-green: #66BB6A;    /* Verde */
+  
+  /* 🎨 FUNDOS CLAROS (Para evitar o efeito marrom/escuro) */
+  --kids-bg: #F0F4F8;       
+  --kids-white: #FFFFFF;
+  --kids-yellow-light: #FFF9C4; /* Fundo suave para o bloco amarelo */
+  
+  /* ✍️ TEXTOS */
+  --kids-text: #263238;     /* Cinza muito escuro (quase preto) */
+  --kids-text-light: #607D8B;
+  --kids-text-yellow: #7B5E00; /* Marrom dourado para ler sobre amarelo */
+  
+  /* 🪄 EFEITOS */
+  --kids-shadow: 0 8px 20px rgba(0,0,0,0.06);
+  --font-family: 'DM Sans', sans-serif;
+}
+
+/* 🏠 CONFIGURAÇÃO GERAL DO CORPO */
+body {
+    margin: 0;
+    background-color: var(--kids-bg);
+    font-family: var(--font-family);
+    color: var(--kids-text);
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 📱 HEADER ESTILO APP */
+.kids-header {
+    background-color: var(--kids-white);
+    padding: 20px;
+    border-bottom-left-radius: 40px;
+    border-bottom-right-radius: 40px;
+    box-shadow: var(--kids-shadow);
+}
+
+/* AVATAR DO USUÁRIO */
+.avatar-kids {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--kids-blue), #42A5F5);
+    color: white;
+    border-radius: 18px;
+    display: grid;
+    place-items: center;
+    font-weight: bold;
+}
+
+/* 🎫 CARD PRINCIPAL DE BOAS-VINDAS */
+.project-card {
+    background: linear-gradient(135deg, #FFFDE7, var(--kids-yellow-light));
+    padding: 20px;
+    margin: 20px;
+    border-radius: 25px;
+    border: 3px dashed var(--kids-yellow);
+    text-align: center;
+}
+
+/* 💡 BALÃO DO MASCOTE / ESPECIALISTA */
+.specialist-bubble {
+    margin: 20px;
+    background-color: var(--kids-white);
+    border-radius: 30px;
+    padding: 20px;
+    box-shadow: var(--kids-shadow);
+}
+
+/* 🛡️ TAGS DE CATEGORIA */
+.tag-kids {
+    background-color: var(--kids-green);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+/* 🧩 BLOCOS TEMÁTICOS (ESTRUTURA) */
+.adventure-block { margin-bottom: 40px; padding: 0 20px; }
+
+/* ⭐ AJUSTE ESPECÍFICO: MATEMÁTICA BÁSICA (AMARELO VIVO) */
+.adventure-block.orange h3 { 
+    color: var(--kids-text-yellow) !important; /* Texto legível */
+}
+
+/* Aplica o fundo amarelo vivo nos cards deste bloco */
+.adventure-block.orange .kids-card {
+    background-color: var(--kids-yellow-light) !important; 
+    border: 2px solid var(--kids-yellow) !important;
+}
+
+.adventure-block.orange .card-icon {
+    color: var(--kids-yellow);
+}
+
+/* 🗂️ GRID DE CARDS DOS MÓDULOS */
+.kids-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.kids-card {
+    background-color: var(--kids-white);
+    border-radius: 25px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: var(--kids-shadow);
+    transition: transform 0.2s ease;
+}
+
+.kids-card:active { transform: scale(0.96); }
+
+/* 🎨 VARIAÇÕES DE CORES DOS TÍTULOS */
+.adventure-block.blue h3 { color: var(--kids-blue); }
+.adventure-block.green h3 { color: var(--kids-green); }
+
+/* 🖥️ ÁREAS INTERATIVAS (CANVAS) */
+.kids-canvas {
+    height: 150px;
+    background-color: #FFFFFF; /* Fundo branco puro para destaque */
+    border-radius: 20px;
+    margin: 10px 0;
+    box-shadow: inset 0 4px 8px rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* 🔘 BOTÕES DE AÇÃO */
+.btn-play {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 15px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+}
+
+.btn-play.blue { background-color: var(--kids-blue); }
+
+/* 🔢 MINI CARDS DE OPERAÇÕES */
+.mini-card-kids {
+    background-color: var(--kids-white);
+    padding: 10px;
+    border-radius: 20px;
+    box-shadow: var(--kids-shadow);
+    text-align: center;
+}
+
+.mini-canvas-kids {
+    width: 100%;
+    height: 70px;
+    background-color: var(--kids-yellow-light);
+    border-radius: 15px;
+    margin: 8px 0;
+    box-shadow: inset 0 3px 6px rgba(0,0,0,0.05);
+}
+
+/* 👣 RODAPÉ ESCURO (CONTRASTE FINAL) */
+.kids-footer {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #263238; /* Cinza Profundo */
+    color: #ECEFF1;
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+}
+
+/* ===== SEÇÃO ESPECIALISTA (MODIFICAÇÕES AQUI) ===== */
+.expert-section {
+    padding: 40px 20px;
+}
+
+.expert-inner {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Ajuste para garantir que nada tampe a foto */
+.expert-photo-wrap {
+    position: relative;
+    background: transparent !important; /* Removido fundos bege */
+}
+
+.expert-photo {
+    background: transparent !important;
+}
+
+.photo-real {
+    position: relative;
+    overflow: hidden;
+    border-radius: 25px;
+    background-color: transparent !important;
+}
+
+.photo-real img {
+    width: 300px;
+    height: 380px;
+    object-fit: cover;
+    display: block;
+    border-radius: 25px;
+    position: relative;
+    z-index: 1; /* Garante que a foto fique por baixo do texto, mas visível */
+}
+
+.photo-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px 15px 15px;
+    /* Gradiente ajustado para não escurecer a foto toda */
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
+    color: white;
+    z-index: 2;
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+}
+
+/* Nome */
+.photo-name {
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+/* Cargo */
+.photo-role {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+/* Badge flutuante */
+.expert-badge-float {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: var(--kids-green);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    box-shadow: var(--kids-shadow);
+    z-index: 3;
+}
+
+/* ===== TEXTOS ===== */
+.section-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--kids-blue);
+    font-weight: bold;
+}
+
+.section-title {
+    font-size: 1.8rem;
+    margin: 10px 0 20px;
+    color: var(--kids-text);
+}
+
+.section-body {
+    font-size: 0.95rem;
+    color: var(--kids-text-light);
+    line-height: 1.6;
+}
+
+/* Citação */
+.quote-block {
+    background-color: var(--kids-white);
+    padding: 20px;
+    border-left: 5px solid var(--kids-yellow);
+    border-radius: 15px;
+    margin-bottom: 20px;
+    box-shadow: var(--kids-shadow);
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .expert-inner {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .photo-real img {
+        width: 100%;
+        height: auto;
+        max-width: 300px; /* Mantém um tamanho bom no celular */
+        margin: 0 auto;
+    }
+}
+
+.photo-real img {
+    width: 100%;
+    height: 380px;
+    object-fit: cover;
+    display: block;
+    /* Adicione estas duas linhas abaixo */
+    min-height: 380px; 
+    background-color: #f0f0f0; /* Cor cinza clara enquanto não carrega */
+}
+
+/* Garante que o texto não suba se a imagem falhar */
+.photo-overlay {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+}

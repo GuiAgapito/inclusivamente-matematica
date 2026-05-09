@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adição & Subtração</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0d1b2a;
+      --panel: rgba(10, 20, 35, 0.88);
+      --border: rgba(168, 218, 220, 0.2);
+      --text: #e8f4f8;
+      --muted: rgba(232, 244, 248, 0.45);
+      --accent: #a8dadc;
+      --gold: #ffd166;
+      --green: #4caf50;
+      --red: #ef5350;
+      --teal: #2a9d8f;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      overflow: hidden;
+      cursor: default;
+    }
+
+    canvas { display: block; }
+
+    .glass {
+      background: var(--panel);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+      color: var(--text);
+    }
+
+    #ui {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 296px;
+      padding: 24px;
+      z-index: 10;
+    }
+
+    .section-tag {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+
+    .op-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .op-btn {
+      height: 56px;
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      font-size: 30px;
+      font-weight: 900;
+      cursor: pointer;
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.5);
+      transition: all 0.22s;
+      font-family: 'DM Mono', monospace;
+    }
+    .op-btn:hover { background: rgba(255,255,255,0.11); }
+    .op-btn.sel-add {
+      background: rgba(76,175,80,0.22);
+      border-color: rgba(76,175,80,0.7);
+      color: #a5d6a7;
+      box-shadow: 0 0 20px rgba(76,175,80,0.15);
+    }
+    .op-btn.sel-sub {
+      background: rgba(239,83,80,0.22);
+      border-color: rgba(239,83,80,0.7);
+      color: #ef9a9a;
+      box-shadow: 0 0 20px rgba(239,83,80,0.15);
+    }
+
+    .num-grid {
+      display: grid;
+      grid-template-columns: 1fr 32px 1fr;
+      gap: 8px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+    .num-wrapper { display: flex; flex-direction: column; gap: 6px; }
+    .num-label {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      text-align: center;
+    }
+    .num-input {
+      background: rgba(255,255,255,0.09);
+      border: 1.5px solid rgba(255,255,255,0.18);
+      border-radius: 14px;
+      color: #fff;
+      font-size: 32px;
+      font-weight: 800;
+      font-family: 'DM Mono', monospace;
+      padding: 10px 8px;
+      text-align: center;
+      width: 100%;
+      -moz-appearance: textfield;
+      transition: border-color 0.2s;
+    }
+    .num-input::-webkit-outer-spin-button,
+    .num-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .num-input:focus { outline: none; border-color: var(--accent); background: rgba(168,218,220,0.08); }
+    .op-symbol {
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--gold);
+      text-align: center;
+      padding-bottom: 10px;
+      font-family: 'DM Mono', monospace;
+      line-height: 1;
+    }
+
+    .calc-btn {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #2c6e9b 0%, #1d3557 100%);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      font-family: 'Nunito', sans-serif;
+      cursor: pointer;
+      margin-bottom: 9px;
+      transition: transform 0.15s, opacity 0.2s, box-shadow 0.2s;
+      letter-spacing: 0.3px;
+      box-shadow: 0 4px 16px rgba(29,53,87,0.5);
+    }
+    .calc-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(29,53,87,0.6); }
+    .calc-btn:active:not(:disabled) { transform: translateY(0); }
+    .calc-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .reset-btn {
+      width: 100%;
+      padding: 10px;
+      border: 1.5px solid rgba(255,255,255,0.14);
+      border-radius: 12px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'Nunito', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .reset-btn:hover { background: rgba(255,255,255,0.07); color: var(--text); }
+
+    #steps {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 14px 32px;
+      text-align: center;
+      z-index: 10;
+      min-width: 300px;
+      max-width: 580px;
+      transition: opacity 0.3s;
+    }
+    #step-tag {
+      font-size: 9px;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 2.5px;
+      margin-bottom: 5px;
+    }
+    #step-msg {
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.4;
+      color: var(--text);
+    }
+
+    #legend {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 18px 22px;
+      z-index: 10;
+    }
+    .leg-title { font-size: 9px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+    .leg { display: flex; align-items: center; gap: 11px; margin-bottom: 9px; font-size: 13px; font-weight: 700; color: var(--text); }
+    .leg:last-child { margin-bottom: 0; }
+    .leg-dot { width: 17px; height: 17px; border-radius: 5px; flex-shrink: 0; }
+
+    #hint {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+      z-index: 10;
+      text-align: right;
+      line-height: 1.8;
+    }
+  </style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="ui" class="glass">
+  <div class="section-tag">Operação</div>
+  <div class="op-row">
+    <button class="op-btn sel-add" id="btn-add" onclick="selectOp('add')">+</button>
+    <button class="op-btn" id="btn-sub" onclick="selectOp('sub')">−</button>
+  </div>
+
+  <div class="section-tag">Números (0 a 99)</div>
+  <div class="num-grid">
+    <div class="num-wrapper">
+      <div class="num-label">Número 1</div>
+      <input id="n1" class="num-input" type="number" min="0" max="99" value="47">
+    </div>
+    <div class="op-symbol" id="op-sym">+</div>
+    <div class="num-wrapper">
+      <div class="num-label">Número 2</div>
+      <input id="n2" class="num-input" type="number" min="0" max="99" value="35">
+    </div>
+  </div>
+
+  <button class="calc-btn" id="calc-btn" onclick="calculate()">🎯 &nbsp;Calcular!</button>
+  <button class="reset-btn" onclick="resetAll()">↺ &nbsp;Reiniciar Cena</button>
+</div>
+
+<div id="steps" class="glass">
+  <div id="step-tag">Instrução</div>
+  <div id="step-msg">Escolha uma operação, insira os números e pressione Calcular! 🎓</div>
+</div>
+
+<div id="legend" class="glass">
+  <div class="leg-title">Legenda</div>
+  <div class="leg"><div class="leg-dot" style="background:#f4a261"></div>Unidade (1)</div>
+  <div class="leg"><div class="leg-dot" style="background:#457b9d"></div>Dezena (10)</div>
+  <div class="leg"><div class="leg-dot" style="background:#2a9d8f"></div>Empréstimo / Vai um</div>
+  <div class="leg"><div class="leg-dot" style="background:#ef5350"></div>Valor a remover</div>
+</div>
+
+<div id="hint">
+  🖱️ Arraste para girar<br>
+  🔍 Scroll para zoom
+</div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script>
+'use strict';
+
+gsap.globalTimeline.timeScale(0.4);
+
+
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.6;
+renderer.physicallyCorrectLights = true;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0d1b2a);
+scene.fog = new THREE.FogExp2(0x0d1b2a, 0.028);
+
+const cam = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 120);
+cam.position.set(0, 13, 17);
+
+const orbitControls = new THREE.OrbitControls(cam, renderer.domElement);
+orbitControls.enableDamping = true;
+orbitControls.dampingFactor = 0.06;
+orbitControls.minDistance = 8;
+orbitControls.maxDistance = 32;
+orbitControls.maxPolarAngle = Math.PI / 2.05;
+orbitControls.target.set(0, 1.5, 0);
+orbitControls.update();
+
+const ambientLight = new THREE.AmbientLight(0xffeedd, 0.8);
+scene.add(ambientLight);
+
+const sunLight = new THREE.DirectionalLight(0xfff8ee, 1.5);
+sunLight.position.set(9, 18, 8);
+sunLight.castShadow = true;
+sunLight.shadow.mapSize.set(2048, 2048);
+sunLight.shadow.camera.near = 0.5;
+sunLight.shadow.camera.far = 70;
+[-16, 16].forEach(v => {
+  sunLight.shadow.camera.left = -v; sunLight.shadow.camera.right = v;
+  sunLight.shadow.camera.top = v;  sunLight.shadow.camera.bottom = -v;
+});
+sunLight.shadow.camera.left = -18; sunLight.shadow.camera.right = 18;
+sunLight.shadow.camera.top = 18;   sunLight.shadow.camera.bottom = -18;
+sunLight.shadow.bias = -0.0008;
+scene.add(sunLight);
+
+const fillA = new THREE.PointLight(0x4a8fc2, 0.8, 24);
+fillA.position.set(-8, 8, 5);
+scene.add(fillA);
+
+const fillB = new THREE.PointLight(0xa8dadc, 0.6, 20);
+fillB.position.set(5, 5, -7);
+scene.add(fillB);
+
+(function buildEnv() {
+  // Main table surface
+  const tableMat = new THREE.MeshStandardMaterial({ color: 0x3b2312, roughness: 0.84, metalness: 0.03 });
+  const table = new THREE.Mesh(new THREE.BoxGeometry(18, 0.28, 16), tableMat);
+  table.position.y = -0.14;
+  table.receiveShadow = true;
+  scene.add(table);
+
+  const strip = new THREE.Mesh(
+    new THREE.BoxGeometry(18.06, 0.035, 16.06),
+    new THREE.MeshStandardMaterial({ color: 0x5c3820, roughness: 0.55, metalness: 0.08 })
+  );
+  strip.position.y = 0.018;
+  strip.receiveShadow = true;
+  scene.add(strip);
+
+  const dotGeo = new THREE.CircleGeometry(0.04, 8);
+  const dotMat = new THREE.MeshBasicMaterial({ color: 0x5c3820, transparent: true, opacity: 0.5 });
+  for (let xi = -8; xi <= 8; xi += 2) {
+    for (let zi = -7; zi <= 7; zi += 2) {
+      const d = new THREE.Mesh(dotGeo, dotMat);
+      d.rotation.x = -Math.PI / 2;
+      d.position.set(xi, 0.022, zi);
+      scene.add(d);
+    }
+  }
+})();
+
+function rrect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+
+function makeCanvasTex(fn, w = 256, h = 256) {
+  const cv = document.createElement('canvas');
+  cv.width = w; cv.height = h;
+  fn(cv.getContext('2d'), cv);
+  return new THREE.CanvasTexture(cv);
+}
+
+// !!! LEMBRAR AMANHÃ: colocar a posição dos blocos para obedecer a forma padrão de operação ensinada nas escolas (fatores em cima e resultado embaixo da igualdade)
+
+const X_TENS  = -2.2;
+const X_UNITS =  2.2;
+const Z_N1    = -3.6;
+const Z_N2    = -0.5;
+const Z_RES   =  3.1;
+
+const BLK_SIZE = 0.60;
+const BLK_GAP  = 0.72;
+const BLK_Y0   = 0.40; 
+
+(function buildDividers() {
+  const matLine = new THREE.MeshStandardMaterial({
+    color: 0xa8dadc, roughness: 0.4, metalness: 0.25, transparent: true, opacity: 0.65
+  });
+
+  const vSep = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.03, 16), matLine);
+  vSep.position.set(0, 0.02, 0);
+  vSep.receiveShadow = true;
+  vSep.castShadow = true;
+  scene.add(vSep);
+
+  const hSep = new THREE.Mesh(new THREE.BoxGeometry(12, 0.04, 0.07), matLine);
+  hSep.position.set(0, 0.024, 1.3);
+  hSep.receiveShadow = true;
+  hSep.castShadow = true;
+  scene.add(hSep);
+
+  const eqMat = new THREE.MeshStandardMaterial({ color: 0xffd166, roughness: 0.5, metalness: 0.3 });
+  [-0.12, 0.12].forEach(dz => {
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.045, 0.07), eqMat);
+    bar.position.set(-7.2, 0.025, Z_RES + dz);
+    bar.receiveShadow = true;
+    bar.castShadow = true;
+    scene.add(bar);
+  });
+})();
+
+function floorLabel(text, x, z, color = '#a8dadc', fontSize = 30, w = 280, h = 60) {
+  const tex = makeCanvasTex((ctx) => {
+    ctx.font = `800 ${fontSize}px Nunito, Arial`;
+    ctx.fillStyle = color;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, w / 2, h / 2);
+  }, w, h);
+  const m = new THREE.Mesh(
+    new THREE.PlaneGeometry(w * 0.012, h * 0.012),
+    new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false })
+  );
+  m.rotation.x = -Math.PI / 2;
+  m.position.set(x, 0.028, z);
+  scene.add(m);
+  return m;
+}
+
+// Column headers
+floorLabel('DEZENAS', X_TENS, -5.8, '#a8dadc', 24, 240, 50);
+floorLabel('UNIDADES', X_UNITS, -5.8, '#f4a261', 24, 240, 50);
+
+// Row labels
+floorLabel('Nº 1', -7.0, Z_N1, 'rgba(255,255,255,0.4)', 24, 140, 50);
+floorLabel('Nº 2', -7.0, Z_N2, 'rgba(255,255,255,0.4)', 24, 140, 50);
+floorLabel('=', -7.0, Z_RES, '#ffd166', 36, 80, 60);
+
+const COLORS = {
+  ten:      0x457b9d,   // AZUL
+  unit:     0xf4a261,   // LARANJA
+  carryTen: 0x2a9d8f,   // VERDE AZULADO
+  carryUni: 0x5cc8b4,   // AZUL CLARO
+  subClr:   0xef5350,   // VERMELHO
+  subTen:   0xc62828,   // VERMELHO SÓ QUE MAIS ESCURO
+};
+
+function hexStr(hex) { return '#' + hex.toString(16).padStart(6, '0'); }
+
+function blockTexture(label, colorHex) {
+  return makeCanvasTex((ctx) => {
+    const c = hexStr(colorHex);
+    rrect(ctx, 5, 5, 118, 118, 22);
+    ctx.fillStyle = c;
+    ctx.fill();
+    rrect(ctx, 5, 5, 118, 58, 22);
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    ctx.fill();
+    rrect(ctx, 5, 5, 118, 118, 22);
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+    ctx.lineWidth = 3.5;
+    ctx.stroke();
+    if (label) {
+      ctx.fillStyle = 'rgba(255,255,255,0.96)';
+      const fs = label.length > 2 ? 34 : label.length === 2 ? 42 : 52;
+      ctx.font = `800 ${fs}px "DM Mono", monospace`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(label, 64, 64);
+    }
+  }, 128, 128);
+}
+
+function makeBlock(x, y, z, colorHex, label = '') {
+  const mesh = new THREE.Mesh(
+    new THREE.BoxGeometry(BLK_SIZE, BLK_SIZE, BLK_SIZE),
+    new THREE.MeshStandardMaterial({
+      color: colorHex,
+      roughness: 0.38,
+      metalness: 0.14,
+      map: blockTexture(label, colorHex),
+    })
+  );
+  mesh.position.set(x, y, z);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  scene.add(mesh);
+  return mesh;
+}
+
+const STATE = {
+  op: 'add',
+  animating: false,
+  n1t: [], n1u: [],     
+  n2t: [], n2u: [],     
+  extra: [],            
+  boardMesh: null,
+};
+
+function clearArr(arr) {
+  arr.forEach(m => { if (m.parent) scene.remove(m); });
+  arr.length = 0;
+}
+
+function placeNumber(num, rowZ, arrT, arrU, colorT, colorU, animated = false) {
+  const tens = Math.floor(num / 10);
+  const units = num % 10;
+  for (let i = 0; i < tens; i++) {
+    const b = makeBlock(X_TENS, BLK_Y0 + i * BLK_GAP, rowZ, colorT, i === 0 ? '10' : '');
+    if (animated) {
+      b.scale.set(0, 0, 0);
+      gsap.to(b.scale, { x: 1, y: 1, z: 1, duration: 0.26, delay: i * 0.08, ease: 'back.out(1.6)' });
+    }
+    arrT.push(b);
+  }
+  for (let i = 0; i < units; i++) {
+    const b = makeBlock(X_UNITS, BLK_Y0 + i * BLK_GAP, rowZ, colorU, i === 0 ? '1' : '');
+    if (animated) {
+      b.scale.set(0, 0, 0);
+      gsap.to(b.scale, { x: 1, y: 1, z: 1, duration: 0.26, delay: i * 0.08, ease: 'back.out(1.6)' });
+    }
+    arrU.push(b);
+  }
+}
+
+function showEquationBoard(n1, op, n2, res) {
+  if (STATE.boardMesh) { scene.remove(STATE.boardMesh); STATE.boardMesh = null; }
+
+  const opChar = op === 'add' ? '+' : '−';
+  const eqStr = `${n1} ${opChar} ${n2} = ${res}`;
+
+  const tex = makeCanvasTex((ctx) => {
+    rrect(ctx, 0, 0, 512, 128, 28);
+    ctx.fillStyle = '#0f2238';
+    ctx.fill();
+    rrect(ctx, 0, 0, 512, 128, 28);
+    ctx.strokeStyle = 'rgba(168,218,220,0.5)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    rrect(ctx, 2, 2, 508, 62, 26);
+    ctx.fillStyle = 'rgba(255,255,255,0.04)';
+    ctx.fill();
+    ctx.font = '800 62px "DM Mono", monospace';
+    ctx.fillStyle = '#a8dadc';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(eqStr, 256, 64);
+  }, 512, 128);
+
+  STATE.boardMesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(7.5, 1.88),
+    new THREE.MeshStandardMaterial({ map: tex, roughness: 0.35, transparent: true, opacity: 0.97 })
+  );
+  STATE.boardMesh.position.set(0, 7.2, -1.0);
+  STATE.boardMesh.rotation.x = -0.18;
+  STATE.boardMesh.scale.set(0, 0, 0);
+  scene.add(STATE.boardMesh);
+  gsap.to(STATE.boardMesh.scale, { x: 1, y: 1, z: 1, duration: 0.55, ease: 'back.out(1.4)' });
+}
+
+function step(tag, msg) {
+  document.getElementById('step-tag').textContent = tag;
+  document.getElementById('step-msg').textContent = msg;
+}
+
+function wait(ms) { return new Promise(r => setTimeout(r, ms * 2.5)); }
+
+function setDisabled(v) { document.getElementById('calc-btn').disabled = v; }
+
+function getNumbers() {
+  let n1 = Math.max(0, Math.min(99, parseInt(document.getElementById('n1').value) || 0));
+  let n2 = Math.max(0, Math.min(99, parseInt(document.getElementById('n2').value) || 0));
+  return { n1, n2 };
+}
+
+function selectOp(op) {
+  STATE.op = op;
+  document.getElementById('btn-add').className = 'op-btn' + (op === 'add' ? ' sel-add' : '');
+  document.getElementById('btn-sub').className = 'op-btn' + (op === 'sub' ? ' sel-sub' : '');
+  document.getElementById('op-sym').textContent = op === 'add' ? '+' : '−';
+}
+
+function resetAll() {
+  clearArr(STATE.n1t); clearArr(STATE.n1u);
+  clearArr(STATE.n2t); clearArr(STATE.n2u);
+  clearArr(STATE.extra);
+  if (STATE.boardMesh) { scene.remove(STATE.boardMesh); STATE.boardMesh = null; }
+  STATE.animating = false;
+  setDisabled(false);
+  step('Instrução', 'Escolha uma operação, insira os números e pressione Calcular! 🎓');
+}
+
+async function animateAddition(n1, n2) {
+  const u1 = n1 % 10, t1 = Math.floor(n1 / 10);
+  const u2 = n2 % 10, t2 = Math.floor(n2 / 10);
+  const unitSum = u1 + u2;
+  const carry   = Math.floor(unitSum / 10);
+  const resU    = unitSum % 10;
+  const resT    = t1 + t2 + carry;
+
+// PASSO A PASSO DA OPERAÇÃO ESCOLHIDA COMO SOMA
+  step('Passo 1 / 4', `Representando ${n1} com blocos! Azul = dezena (10), Laranja = unidade (1)`);
+  placeNumber(n1, Z_N1, STATE.n1t, STATE.n1u, COLORS.ten, COLORS.unit, true);
+  await wait(Math.max(t1, u1) * 85 + 750);
+
+  step('Passo 2 / 4', `Agora representando ${n2}!`);
+  placeNumber(n2, Z_N2, STATE.n2t, STATE.n2u, COLORS.ten, COLORS.unit, true);
+  await wait(Math.max(t2, u2) * 85 + 750);
+
+  step('Passo 3 / 4', `Somando as UNIDADES: ${u1} + ${u2} = ${unitSum}${carry > 0 ? ' — precisamos reagrupar!' : ''}`);
+  await wait(1300);
+
+  if (carry > 0) {
+    step('🔄 Reagrupamento!', `${unitSum} unidades ≥ 10! Juntamos 10 em 1 dezena e sobram ${resU} unidades.`);
+
+    const allUnits = [...STATE.n1u, ...STATE.n2u];
+    const groupU = allUnits.slice(0, 10); 
+    const remU = allUnits.slice(10);      
+
+    groupU.forEach((b, i) => {
+      gsap.to(b.scale, { x: 1.4, y: 1.4, z: 1.4, duration: 0.18, delay: i * 0.04, yoyo: true, repeat: 1 });
+    });
+    await wait(500);
+
+    groupU.forEach((b, i) => {
+      gsap.to(b.scale, { x: 0, y: 0, z: 0, duration: 0.22, delay: i * 0.035, ease: 'power2.in',
+        onComplete: () => scene.remove(b) });
+    });
+    STATE.n1u = remU;
+    STATE.n2u = [];
+    await wait(600);
+
+    const carryBlk = makeBlock(X_UNITS + 0.5, BLK_Y0 + 2.5, Z_N1, COLORS.carryTen, '+1');
+    carryBlk.scale.set(0, 0, 0);
+    gsap.to(carryBlk.scale, { x: 1.3, y: 1.3, z: 1.3, duration: 0.3, ease: 'back.out(2)' });
+    await wait(350);
+    gsap.to(carryBlk.position, {
+      x: X_TENS,
+      y: BLK_Y0 + t1 * BLK_GAP,
+      duration: 0.7,
+      ease: 'power2.inOut'
+    });
+    gsap.to(carryBlk.scale, { x: 1, y: 1, z: 1, duration: 0.3, delay: 0.35 });
+    STATE.extra.push(carryBlk);
+    await wait(850);
+
+    step(`+1 dezena adicionada! ${t1} + ${t2} + 1 = ${resT} dezenas no total`);
+    await wait(1100);
+  }
+
+  step('Passo 4 / 4', `Somando as DEZENAS: ${t1} + ${t2}${carry > 0 ? ' + 1' : ''} = ${resT}`);
+  await wait(900);
+
+  const allT = [...STATE.n1t, ...STATE.n2t, ...STATE.extra.filter(b => Math.abs(b.position.x - X_TENS) < 0.5)];
+  const allU = [...STATE.n1u, ...STATE.n2u];
+
+  let ti = 0, ui = 0;
+  [...allT, ...allU].forEach((b, idx) => {
+    const isTen = allT.includes(b);
+    const dest  = isTen ? ti++ : ui++;
+    gsap.to(b.position, {
+      x: isTen ? X_TENS : X_UNITS,
+      y: BLK_Y0 + dest * BLK_GAP,
+      z: Z_RES,
+      duration: 0.55,
+      delay: idx * 0.045,
+      ease: 'power2.inOut',
+    });
+    gsap.to(b.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.18,
+      delay: idx * 0.045 + 0.28, yoyo: true, repeat: 1 });
+  });
+  await wait(Math.max(allT.length, allU.length) * 50 + 700);
+
+  showEquationBoard(n1, 'add', n2, n1 + n2);
+  step('🎉 Resultado!', `${n1} + ${n2} = ${n1 + n2}!`);
+}
+
+async function animateSubtraction(n1, n2) {
+  const u1 = n1 % 10, t1 = Math.floor(n1 / 10);
+  const u2 = n2 % 10, t2 = Math.floor(n2 / 10);
+  const needsBorrow = u1 < u2;
+
+  //PASSO A PASSO PARA A SUBTRAÇÃO
+  step('Passo 1 / 4', `Representando ${n1} com blocos!`);
+  placeNumber(n1, Z_N1, STATE.n1t, STATE.n1u, COLORS.ten, COLORS.unit, true);
+  await wait(Math.max(t1, u1) * 85 + 750);
+
+  step('Passo 2 / 4', `Representando ${n2} em vermelho — esses serão removidos!`);
+  placeNumber(n2, Z_N2, STATE.n2t, STATE.n2u, COLORS.subTen, COLORS.subClr, true);
+  await wait(Math.max(t2, u2) * 85 + 750);
+
+  //PEDIR EMPRESTADO
+  let borrowedUnits = [];
+  let effectiveTens = t1;
+
+  if (needsBorrow) {
+    step('🔄 Empréstimo!', `${u1} < ${u2}! Vamos pegar emprestado 1 dezena — ela se transforma em 10 unidades!`);
+    await wait(1300);
+
+    const borrowTen = STATE.n1t[STATE.n1t.length - 1];
+    gsap.to(borrowTen.material, { emissiveIntensity: 0.8, duration: 0.3 });
+    borrowTen.material.emissive = new THREE.Color(COLORS.carryTen);
+    gsap.to(borrowTen.scale, { x: 1.45, y: 1.45, z: 1.45, duration: 0.3 });
+    await wait(500);
+
+    gsap.to(borrowTen.position, {
+      x: X_UNITS,
+      y: BLK_Y0 + u1 * BLK_GAP + 3.5,
+      duration: 0.55,
+      ease: 'power2.inOut'
+    });
+    gsap.to(borrowTen.scale, { x: 1, y: 1, z: 1, duration: 0.3, delay: 0.2 });
+    await wait(650);
+
+    scene.remove(borrowTen);
+    STATE.n1t.pop();
+    effectiveTens = t1 - 1;
+
+    for (let i = 0; i < 10; i++) {
+      const nb = makeBlock(X_UNITS, BLK_Y0 + (u1 + i) * BLK_GAP, Z_N1, COLORS.carryUni, '');
+      nb.scale.set(0, 0, 0);
+      gsap.to(nb.scale, { x: 1, y: 1, z: 1, duration: 0.22, delay: i * 0.055, ease: 'back.out(2)' });
+      borrowedUnits.push(nb);
+      STATE.extra.push(nb);
+    }
+    await wait(10 * 55 + 550);
+
+    step('Empréstimo feito!', `Agora temos ${u1 + 10} unidades. ${u1 + 10} − ${u2} = ${u1 + 10 - u2}`);
+    await wait(1100);
+  }
+
+  step('Passo 3 / 4', `Removendo ${u2} unidade${u2 !== 1 ? 's' : ''}...`);
+  await wait(600);
+
+  const allUnits = [...STATE.n1u, ...borrowedUnits];
+  const toRemoveU = allUnits.slice(allUnits.length - u2);
+  const keepU     = allUnits.slice(0, allUnits.length - u2);
+
+  toRemoveU.forEach((b, i) => {
+    gsap.to(b.material, { emissiveIntensity: 0.9, duration: 0.15, delay: i * 0.08,
+      onStart: () => b.material.emissive = new THREE.Color(0xff1744) });
+    gsap.to(b.scale, { x: 0, y: 0, z: 0, duration: 0.28, delay: i * 0.08 + 0.2, ease: 'power2.in',
+      onComplete: () => scene.remove(b) });
+  });
+  STATE.n2u.forEach((b, i) => {
+    gsap.to(b.scale, { x: 0, y: 0, z: 0, duration: 0.24, delay: i * 0.06, ease: 'power2.in',
+      onComplete: () => scene.remove(b) });
+  });
+  clearArr(STATE.n2u);
+  await wait(toRemoveU.length * 80 + 550);
+
+  step('Passo 4 / 4', `Removendo ${t2} dezena${t2 !== 1 ? 's' : ''}: ${effectiveTens} − ${t2} = ${effectiveTens - t2}`);
+  await wait(700);
+
+  const toRemoveT = STATE.n1t.slice(STATE.n1t.length - t2);
+  const keepT     = STATE.n1t.slice(0, STATE.n1t.length - t2);
+
+  toRemoveT.forEach((b, i) => {
+    gsap.to(b.material, { emissiveIntensity: 0.9, duration: 0.15, delay: i * 0.1,
+      onStart: () => b.material.emissive = new THREE.Color(0xff1744) });
+    gsap.to(b.scale, { x: 0, y: 0, z: 0, duration: 0.28, delay: i * 0.1 + 0.18, ease: 'power2.in',
+      onComplete: () => scene.remove(b) });
+  });
+  STATE.n2t.forEach((b, i) => {
+    gsap.to(b.scale, { x: 0, y: 0, z: 0, duration: 0.24, delay: i * 0.07, ease: 'power2.in',
+      onComplete: () => scene.remove(b) });
+  });
+  clearArr(STATE.n2t);
+  await wait(Math.max(toRemoveT.length + 1, 1) * 100 + 650);
+
+  keepT.forEach((b, i) => {
+    gsap.to(b.position, { x: X_TENS, y: BLK_Y0 + i * BLK_GAP, z: Z_RES, duration: 0.52, delay: i * 0.06, ease: 'power2.inOut' });
+    gsap.to(b.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.18, delay: i * 0.06 + 0.3, yoyo: true, repeat: 1 });
+  });
+  keepU.forEach((b, i) => {
+    gsap.to(b.position, { x: X_UNITS, y: BLK_Y0 + i * BLK_GAP, z: Z_RES, duration: 0.52, delay: i * 0.06, ease: 'power2.inOut' });
+    gsap.to(b.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.18, delay: i * 0.06 + 0.3, yoyo: true, repeat: 1 });
+  });
+  await wait(Math.max(keepT.length, keepU.length) * 60 + 700);
+
+  showEquationBoard(n1, 'sub', n2, n1 - n2);
+  step('🎉 Resultado!', `${n1} − ${n2} = ${n1 - n2}!`);
+}
+
+async function calculate() {
+  if (STATE.animating) return;
+
+  // Clear and restart
+  clearArr(STATE.n1t); clearArr(STATE.n1u);
+  clearArr(STATE.n2t); clearArr(STATE.n2u);
+  clearArr(STATE.extra);
+  if (STATE.boardMesh) { scene.remove(STATE.boardMesh); STATE.boardMesh = null; }
+
+  await wait(120);
+  STATE.animating = true;
+  setDisabled(true);
+
+  const { n1, n2 } = getNumbers();
+
+  if (STATE.op === 'sub' && n1 < n2) {
+    step('⚠️ Atenção', `${n1} é menor que ${n2}! Para subtrair, o 1º número deve ser ≥ ao 2º. Que tal trocar os valores?`);
+    STATE.animating = false;
+    setDisabled(false);
+    return;
+  }
+
+  try {
+    if (STATE.op === 'add') await animateAddition(n1, n2);
+    else                    await animateSubtraction(n1, n2);
+  } catch (err) {
+    console.error('Animation error:', err);
+  }
+
+  STATE.animating = false;
+  setDisabled(false);
+}
+
+const gltfLoader = new THREE.GLTFLoader();
+const modelUrl = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/models/gltf/RobotExpressive/RobotExpressive.glb';
+
+gltfLoader.load(modelUrl, (gltf) => {
+  const robotModel = gltf.scene;
+  robotModel.position.set(6.2, 0.1, 4.8);
+  robotModel.scale.set(0.25, 0.25, 0.25);
+  robotModel.rotation.y = -Math.PI / 4;
+  
+  robotModel.traverse((node) => {
+    if (node.isMesh) {
+      node.castShadow = true;
+      node.receiveShadow = true;
+    }
+  });
+
+  scene.add(robotModel);
+}, undefined, (error) => {
+  console.error('Erro ao importar o modelo 3D:', error);
+});
+
+const clock = new THREE.Clock();
+
+function tick() {
+  requestAnimationFrame(tick);
+  orbitControls.update();
+
+  const t = clock.getElapsedTime();
+
+  if (STATE.boardMesh) {
+    STATE.boardMesh.position.y = 7.2 + Math.sin(t * 0.85) * 0.06;
+  }
+
+  fillA.intensity = 0.42 + Math.sin(t * 0.5) * 0.05;
+
+  renderer.render(scene, cam);
+}
+tick();
+
+window.addEventListener('resize', () => {
+  cam.aspect = innerWidth / innerHeight;
+  cam.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

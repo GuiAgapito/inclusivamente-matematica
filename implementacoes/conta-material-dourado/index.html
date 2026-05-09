@@ -1,0 +1,863 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Material Dourado Interativo | Computação Gráfica</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        transition: background-color 0.3s ease;
+      }
+
+      /* TEMA PADRÃO (ESCURO) */
+      body.dark {
+        background-color: #0a0a2a;
+      }
+
+      body.light {
+        background-color: #d4d8e8;
+      }
+
+      /* QUADRO PEDAGÓGICO */
+      .quadro-pedagogico {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        width: 220px;
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 12px 15px;
+        z-index: 100;
+        border-left: 4px solid #ffd700;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        pointer-events: none;
+        font-family: "Courier New", monospace;
+        transition: all 0.3s ease;
+      }
+
+      body.dark .quadro-pedagogico {
+        background: rgba(0, 0, 0, 0.85);
+        color: white;
+      }
+
+      body.light .quadro-pedagogico {
+        background: rgba(255, 255, 255, 0.9);
+        color: #1a1a2a;
+        border-left-color: #ffd700;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .quadro-pedagogico h3 {
+        margin: 0 0 8px 0;
+        color: #ffd700;
+        text-align: center;
+        font-size: 14px;
+      }
+
+      .operacao-visual {
+        font-size: 32px;
+        font-weight: bold;
+        text-align: center;
+        padding: 10px;
+        background: rgba(255, 215, 0, 0.15);
+        border-radius: 12px;
+        margin-bottom: 8px;
+      }
+
+      body.dark .operacao-visual {
+        color: #ffd700;
+      }
+      body.light .operacao-visual {
+        color: #b8860b;
+      }
+
+      .numero-por-extenso {
+        text-align: center;
+        font-size: 12px;
+        margin-bottom: 10px;
+        font-style: italic;
+      }
+
+      body.dark .numero-por-extenso {
+        color: #ccc;
+      }
+      body.light .numero-por-extenso {
+        color: #555;
+      }
+
+      .decomposicao {
+        border-radius: 10px;
+        padding: 8px;
+        margin: 8px 0;
+        text-align: center;
+        font-size: 11px;
+      }
+
+      body.dark .decomposicao {
+        background: rgba(255, 215, 0, 0.1);
+      }
+      body.light .decomposicao {
+        background: rgba(255, 215, 0, 0.2);
+      }
+
+      .decomposicao span {
+        display: inline-block;
+        padding: 2px 6px;
+        margin: 2px;
+        border-radius: 6px;
+      }
+
+      .unidade-text {
+        background: #ffd70022;
+        color: #ffd700;
+      }
+      .dezena-text {
+        background: #4caf5022;
+        color: #4caf50;
+      }
+      .centena-text {
+        background: #2196f322;
+        color: #2196f3;
+      }
+      .milhar-text {
+        background: #9c27b022;
+        color: #ce93d8;
+      }
+
+      body.light .unidade-text {
+        color: #b8860b;
+      }
+      body.light .dezena-text {
+        color: #2e7d32;
+      }
+      body.light .centena-text {
+        color: #1565c0;
+      }
+      body.light .milhar-text {
+        color: #6a1b9a;
+      }
+
+      .resultado-box {
+        text-align: center;
+        font-size: 16px;
+        font-weight: bold;
+        padding: 8px;
+        border-radius: 10px;
+        margin-top: 8px;
+        border: 1px solid #4caf50;
+      }
+
+      body.dark .resultado-box {
+        background: rgba(76, 175, 80, 0.2);
+        color: #4caf50;
+      }
+      body.light .resultado-box {
+        background: rgba(76, 175, 80, 0.15);
+        color: #2e7d32;
+      }
+
+      /* PAINEL DE CONTROLE */
+      .controls {
+        position: absolute;
+        bottom: 15px;
+        left: 15px;
+        right: 15px;
+        backdrop-filter: blur(12px);
+        border-radius: 16px;
+        padding: 12px 15px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        z-index: 100;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        pointer-events: auto;
+        transition: all 0.3s ease;
+      }
+
+      body.dark .controls {
+        background: rgba(20, 20, 35, 0.95);
+      }
+      body.light .controls {
+        background: rgba(240, 242, 255, 0.95);
+        border: 1px solid rgba(0, 0, 0, 0.15);
+      }
+
+      .counter-group {
+        display: flex;
+        gap: 10px;
+        padding: 6px 12px;
+        border-radius: 40px;
+      }
+
+      body.dark .counter-group {
+        background: rgba(0, 0, 0, 0.5);
+      }
+      body.light .counter-group {
+        background: rgba(0, 0, 0, 0.08);
+      }
+
+      .counter {
+        font-size: 14px;
+        font-weight: bold;
+        padding: 4px 8px;
+        border-radius: 20px;
+      }
+
+      .counter.unidade {
+        background: #ffd70022;
+        color: #ffd700;
+      }
+      .counter.dezena {
+        background: #4caf5022;
+        color: #4caf50;
+      }
+      .counter.centena {
+        background: #2196f322;
+        color: #2196f3;
+      }
+      .counter.milhar {
+        background: #9c27b022;
+        color: #ce93d8;
+      }
+
+      body.light .counter.unidade {
+        color: #b8860b;
+      }
+      body.light .counter.dezena {
+        color: #2e7d32;
+      }
+      body.light .counter.centena {
+        color: #1565c0;
+      }
+      body.light .counter.milhar {
+        color: #6a1b9a;
+      }
+
+      button {
+        padding: 8px 18px;
+        font-weight: bold;
+        border: none;
+        border-radius: 40px;
+        cursor: pointer;
+        transition: transform 0.1s;
+        font-size: 14px;
+      }
+      button:active {
+        transform: scale(0.96);
+      }
+
+      .soma {
+        background: #4caf50;
+        color: white;
+      }
+      .sub {
+        background: #f44336;
+        color: white;
+      }
+      .mult {
+        background: #ff9800;
+        color: white;
+      }
+      .div {
+        background: #9c27b0;
+        color: white;
+      }
+      .reset {
+        background: #555;
+        color: white;
+      }
+      .tema-btn {
+        background: #ffd700;
+        color: #1a1a2a;
+      }
+      body.light .tema-btn {
+        background: #b8860b;
+        color: white;
+      }
+
+      .valor-input {
+        border-radius: 40px;
+        padding: 8px 16px;
+        width: 80px;
+        text-align: center;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      body.dark .valor-input {
+        background: #222;
+        color: white;
+        border: 1px solid #ffd700;
+      }
+      body.light .valor-input {
+        background: white;
+        color: #1a1a2a;
+        border: 1px solid #b8860b;
+      }
+
+      .executar {
+        background: linear-gradient(135deg, #ffd700, #ffa000);
+        color: #1a1a2a;
+        font-weight: bold;
+      }
+
+      body.light .executar {
+        background: linear-gradient(135deg, #b8860b, #8b6508);
+        color: white;
+      }
+
+      .instructions {
+        font-size: 10px;
+        margin-left: 10px;
+      }
+
+      body.dark .instructions {
+        color: #888;
+      }
+      body.light .instructions {
+        color: #666;
+      }
+
+      @media (max-width: 800px) {
+        .quadro-pedagogico {
+          width: 180px;
+          padding: 8px 10px;
+        }
+        .operacao-visual {
+          font-size: 24px;
+        }
+        .controls {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .counter-group {
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body class="dark">
+    <!-- QUADRO PEDAGÓGICO -->
+    <div class="quadro-pedagogico" id="quadroPedagogico">
+      <h3>📖 QUADRO DE VALORES</h3>
+      <div class="operacao-visual" id="operacaoVisual">0</div>
+      <div class="numero-por-extenso" id="extenso">zero</div>
+      <div class="decomposicao" id="decomposicao"></div>
+      <div class="resultado-box">TOTAL: <span id="valorTotal">0</span></div>
+    </div>
+
+    <!-- PAINEL DE CONTROLE -->
+    <div class="controls">
+      <div class="counter-group">
+        <span class="counter unidade" id="unidadeCount">0U</span>
+        <span class="counter dezena" id="dezenaCount">0D</span>
+        <span class="counter centena" id="centenaCount">0C</span>
+        <span class="counter milhar" id="milharCount">0M</span>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+        <button id="btnSoma" class="soma">➕ SOMAR</button>
+        <button id="btnSub" class="sub">➖ SUBTRAIR</button>
+        <button id="btnMult" class="mult">✖️ MULTIPLICAR</button>
+        <button id="btnDiv" class="div">➗ DIVIDIR</button>
+        <button id="btnReset" class="reset">🔄 ZERAR</button>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center">
+        <span>📝 VALOR:</span>
+        <input
+          type="number"
+          id="valorInput"
+          class="valor-input"
+          value="1"
+          min="1"
+          step="1"
+        />
+        <button id="btnExecutar" class="executar">▶ EXECUTAR</button>
+      </div>
+      <button id="btnTema" class="tema-btn">🌓 TEMA CLARO/ESCURO</button>
+      <div class="instructions">
+        💡 10 UNID = 1 DEZ | 10 DEZ = 1 CENT | 10 CENT = 1 MIL
+      </div>
+    </div>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+        }
+      }
+    </script>
+
+    <script type="module">
+      import * as THREE from "three";
+      import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+      // --- CONFIGURAÇÕES GLOBAIS ---
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0a0a2a);
+      scene.fog = new THREE.FogExp2(0x0a0a2a, 0.008);
+
+      const camera = new THREE.PerspectiveCamera(
+        45,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000,
+      );
+      camera.position.set(12, 8, 15);
+      camera.lookAt(0, 2.5, 0);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true;
+      document.body.appendChild(renderer.domElement);
+
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.target.set(0, 2.5, 0);
+      controls.zoomSpeed = 1.0;
+
+      // --- LUZES ---
+      const ambientLight = new THREE.AmbientLight(0x404060, 0.6);
+      scene.add(ambientLight);
+      const dirLight = new THREE.DirectionalLight(0xfff5e6, 1.2);
+      dirLight.position.set(5, 10, 7);
+      dirLight.castShadow = true;
+      dirLight.shadow.mapSize.width = 1024;
+      dirLight.shadow.mapSize.height = 1024;
+      scene.add(dirLight);
+      const fillLight = new THREE.PointLight(0x4466cc, 0.4);
+      fillLight.position.set(-3, 4, 4);
+      scene.add(fillLight);
+      const backLight = new THREE.PointLight(0xffaa66, 0.25);
+      backLight.position.set(0, 3, -6);
+      scene.add(backLight);
+
+      // GRADE (chão)
+      const gridHelper = new THREE.GridHelper(20, 20, 0x88aaff, 0x335588);
+      gridHelper.position.y = -0.2;
+      scene.add(gridHelper);
+
+      // --- TEMA CLARO/ESCURO ---
+      let temaAtual = "dark";
+      function alternarTema() {
+        const body = document.body;
+        if (temaAtual === "dark") {
+          body.classList.remove("dark");
+          body.classList.add("light");
+          scene.background.setHex(0xd4d8e8);
+          scene.fog.color.setHex(0xd4d8e8);
+          gridHelper.material.color.setHex(0x666666);
+          temaAtual = "light";
+        } else {
+          body.classList.remove("light");
+          body.classList.add("dark");
+          scene.background.setHex(0x0a0a2a);
+          scene.fog.color.setHex(0x0a0a2a);
+          gridHelper.material.color.setHex(0x88aaff);
+          temaAtual = "dark";
+        }
+      }
+      document
+        .getElementById("btnTema")
+        .addEventListener("click", alternarTema);
+
+      // --- PARÂMETROS DE CONSTRUÇÃO ---
+      const CUBE_SIZE = 0.45;
+
+      const COR_UNIDADE = 0xffd700;
+      const COR_DEZENA = 0x4caf50;
+      const COR_CENTENA = 0x2196f3;
+      const COR_MILHAR = 0x9c27b0;
+
+      const materialUnidade = new THREE.MeshStandardMaterial({
+        color: COR_UNIDADE,
+        roughness: 0.2,
+        metalness: 0.05,
+      });
+      const materialDezena = new THREE.MeshStandardMaterial({
+        color: COR_DEZENA,
+        roughness: 0.2,
+      });
+      const materialCentena = new THREE.MeshStandardMaterial({
+        color: COR_CENTENA,
+        roughness: 0.2,
+      });
+      const materialMilhar = new THREE.MeshStandardMaterial({
+        color: COR_MILHAR,
+        roughness: 0.2,
+      });
+
+      const meshMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+
+      // FUNÇÕES DE CRIAÇÃO (COM MALHA VISÍVEL)
+
+      function criarUnidade(x, z, yBase = 0.2) {
+        const group = new THREE.Group();
+        const geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);
+        const cube = new THREE.Mesh(geometry, materialUnidade.clone());
+        cube.castShadow = true;
+        cube.position.y = CUBE_SIZE / 2;
+        group.add(cube);
+
+        const edges = new THREE.EdgesGeometry(geometry);
+        const wire = new THREE.LineSegments(edges, meshMaterial);
+        wire.position.y = CUBE_SIZE / 2;
+        group.add(wire);
+
+        group.position.set(x, yBase, z);
+        return group;
+      }
+
+      function criarDezena(x, z, yBase = 0.2) {
+        const group = new THREE.Group();
+        const geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);
+
+        for (let i = 0; i < 10; i++) {
+          const cube = new THREE.Mesh(geometry, materialDezena.clone());
+          cube.position.y = i * CUBE_SIZE + CUBE_SIZE / 2;
+          cube.castShadow = true;
+          group.add(cube);
+
+          const edges = new THREE.EdgesGeometry(geometry);
+          const wire = new THREE.LineSegments(edges, meshMaterial);
+          wire.position.y = i * CUBE_SIZE + CUBE_SIZE / 2;
+          group.add(wire);
+        }
+        group.position.set(x, yBase, z);
+        return group;
+      }
+
+      function criarCentena(x, z, yBase = 0.2) {
+        const group = new THREE.Group();
+        const geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);
+
+        for (let i = 0; i < 10; i++) {
+          for (let j = 0; j < 10; j++) {
+            const posX = (j - 4.5) * CUBE_SIZE;
+            const posY = i * CUBE_SIZE + CUBE_SIZE / 2;
+
+            const cube = new THREE.Mesh(geometry, materialCentena.clone());
+            cube.position.set(posX, posY, 0);
+            cube.castShadow = true;
+            group.add(cube);
+
+            const edges = new THREE.EdgesGeometry(geometry);
+            const wire = new THREE.LineSegments(edges, meshMaterial);
+            wire.position.set(posX, posY, 0);
+            group.add(wire);
+          }
+        }
+        group.position.set(x, yBase, z);
+        return group;
+      }
+
+      function criarMilhar(x, z, yBase = 0.2) {
+        const group = new THREE.Group();
+        const geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);
+
+        for (let k = 0; k < 10; k++) {
+          for (let i = 0; i < 10; i++) {
+            for (let j = 0; j < 10; j++) {
+              const posX = (j - 4.5) * CUBE_SIZE;
+              const posY = i * CUBE_SIZE + CUBE_SIZE / 2;
+              const posZ = (k - 4.5) * CUBE_SIZE;
+
+              const cube = new THREE.Mesh(geometry, materialMilhar.clone());
+              cube.position.set(posX, posY, posZ);
+              cube.castShadow = true;
+              group.add(cube);
+
+              const edges = new THREE.EdgesGeometry(geometry);
+              const wire = new THREE.LineSegments(edges, meshMaterial);
+              wire.position.set(posX, posY, posZ);
+              group.add(wire);
+            }
+          }
+        }
+        group.position.set(x, yBase, z);
+        return group;
+      }
+
+      // POSICIONAMENTO DAS PEÇAS
+      let unidades = 0,
+        dezenas = 0,
+        centenas = 0,
+        milhares = 0;
+      let operacaoAtual = "soma";
+
+      const grupoUnidades = new THREE.Group();
+      const grupoDezenas = new THREE.Group();
+      const grupoCentenas = new THREE.Group();
+      const grupoMilhares = new THREE.Group();
+
+      scene.add(grupoUnidades, grupoDezenas, grupoCentenas, grupoMilhares);
+
+      const posUnidades = { startX: -6, startZ: -2.5, cols: 5, step: 0.6 };
+      const posDezenas = { startX: -3.5, startZ: -2, cols: 4, step: 1.1 };
+      const posCentenas = { startX: 0.5, startZ: -1.5, cols: 2, step: 5.5 };
+      const posMilhares = { startX: -2, startZ: 3.5, stepX: 6.5 };
+
+      // QUADRO PEDAGÓGICO
+      function numeroPorExtenso(n) {
+        if (n === 0) return "zero";
+        if (n === 1) return "um";
+        if (n === 2) return "dois";
+        if (n === 3) return "três";
+        if (n === 4) return "quatro";
+        if (n === 5) return "cinco";
+        if (n === 6) return "seis";
+        if (n === 7) return "sete";
+        if (n === 8) return "oito";
+        if (n === 9) return "nove";
+        if (n === 10) return "dez";
+        if (n < 20)
+          return [
+            "onze",
+            "doze",
+            "treze",
+            "quatorze",
+            "quinze",
+            "dezesseis",
+            "dezessete",
+            "dezoito",
+            "dezenove",
+          ][n - 11];
+        if (n < 100) {
+          const dez = Math.floor(n / 10);
+          const uni = n % 10;
+          const dezenasNomes = [
+            "",
+            "",
+            "vinte",
+            "trinta",
+            "quarenta",
+            "cinquenta",
+            "sessenta",
+            "setenta",
+            "oitenta",
+            "noventa",
+          ];
+          return uni === 0
+            ? dezenasNomes[dez]
+            : dezenasNomes[dez] + " e " + numeroPorExtenso(uni);
+        }
+        if (n < 1000) {
+          const cent = Math.floor(n / 100);
+          const resto = n % 100;
+          const centenasNomes = [
+            "",
+            "cento",
+            "duzentos",
+            "trezentos",
+            "quatrocentos",
+            "quinhentos",
+            "seiscentos",
+            "setecentos",
+            "oitocentos",
+            "novecentos",
+          ];
+          if (cent === 1 && resto === 0) return "cem";
+          return resto === 0
+            ? centenasNomes[cent]
+            : centenasNomes[cent] + " e " + numeroPorExtenso(resto);
+        }
+        return n.toString();
+      }
+
+      function atualizarQuadro() {
+        const total =
+          unidades + dezenas * 10 + centenas * 100 + milhares * 1000;
+        document.getElementById("valorTotal").innerHTML = total;
+        document.getElementById("operacaoVisual").innerHTML = total;
+        document.getElementById("extenso").innerHTML = numeroPorExtenso(total);
+
+        let decomp = "";
+        if (milhares > 0)
+          decomp += `<span class="milhar-text">${milhares} milhar${milhares > 1 ? "es" : ""}</span> `;
+        if (centenas > 0)
+          decomp += `<span class="centena-text">${centenas} centena${centenas > 1 ? "s" : ""}</span> `;
+        if (dezenas > 0)
+          decomp += `<span class="dezena-text">${dezenas} dezena${dezenas > 1 ? "s" : ""}</span> `;
+        if (unidades > 0 || total === 0)
+          decomp += `<span class="unidade-text">${unidades} unidade${unidades !== 1 ? "s" : ""}</span>`;
+
+        if (total === 0)
+          decomp = '<span class="unidade-text">0 unidades</span>';
+        document.getElementById("decomposicao").innerHTML = decomp;
+
+        const quadro = document.getElementById("quadroPedagogico");
+        const cores = {
+          soma: "#4CAF50",
+          subtracao: "#f44336",
+          multiplicacao: "#FF9800",
+          divisao: "#9C27B0",
+        };
+        quadro.style.borderLeftColor = cores[operacaoAtual] || "#FFD700";
+      }
+
+      function atualizarDisplay() {
+        document.getElementById("unidadeCount").innerHTML = `${unidades}U`;
+        document.getElementById("dezenaCount").innerHTML = `${dezenas}D`;
+        document.getElementById("centenaCount").innerHTML = `${centenas}C`;
+        document.getElementById("milharCount").innerHTML = `${milhares}M`;
+        atualizarQuadro();
+      }
+
+      function atualizarCena() {
+        while (grupoUnidades.children.length)
+          grupoUnidades.remove(grupoUnidades.children[0]);
+        while (grupoDezenas.children.length)
+          grupoDezenas.remove(grupoDezenas.children[0]);
+        while (grupoCentenas.children.length)
+          grupoCentenas.remove(grupoCentenas.children[0]);
+        while (grupoMilhares.children.length)
+          grupoMilhares.remove(grupoMilhares.children[0]);
+
+        for (let i = 0; i < Math.min(unidades, 9); i++) {
+          const row = Math.floor(i / posUnidades.cols);
+          const col = i % posUnidades.cols;
+          const x = posUnidades.startX + col * posUnidades.step;
+          const z = posUnidades.startZ + row * posUnidades.step;
+          grupoUnidades.add(criarUnidade(x, z));
+        }
+
+        for (let i = 0; i < Math.min(dezenas, 8); i++) {
+          const row = Math.floor(i / posDezenas.cols);
+          const col = i % posDezenas.cols;
+          const x = posDezenas.startX + col * posDezenas.step;
+          const z = posDezenas.startZ + row * posDezenas.step;
+          grupoDezenas.add(criarDezena(x, z));
+        }
+
+        for (let i = 0; i < Math.min(centenas, 4); i++) {
+          const row = Math.floor(i / posCentenas.cols);
+          const col = i % posCentenas.cols;
+          const x = posCentenas.startX + col * posCentenas.step;
+          const z = posCentenas.startZ + row * posCentenas.step;
+          grupoCentenas.add(criarCentena(x, z));
+        }
+
+        for (let i = 0; i < Math.min(milhares, 2); i++) {
+          const x = posMilhares.startX + i * posMilhares.stepX;
+          grupoMilhares.add(criarMilhar(x, posMilhares.startZ));
+        }
+
+        atualizarDisplay();
+      }
+
+      // FUNÇÃO PRINCIPAL: ATUALIZAR A PARTIR DO TOTAL
+      function atualizarAPartirDeTotal(totalUnidades) {
+        let resto = totalUnidades;
+
+        milhares = Math.floor(resto / 1000);
+        resto %= 1000;
+
+        centenas = Math.floor(resto / 100);
+        resto %= 100;
+
+        dezenas = Math.floor(resto / 10);
+        unidades = resto % 10;
+
+        atualizarCena();
+      }
+
+      // OPERAÇÕES
+      function somar(valor) {
+        let total = unidades + dezenas * 10 + centenas * 100 + milhares * 1000;
+        total += valor;
+        atualizarAPartirDeTotal(total);
+      }
+
+      function subtrair(valor) {
+        let total = unidades + dezenas * 10 + centenas * 100 + milhares * 1000;
+        if (total >= valor) {
+          total -= valor;
+          atualizarAPartirDeTotal(total);
+        } else {
+          alert(`⚠️ Não é possível subtrair ${valor}\nTotal atual: ${total}`);
+        }
+      }
+
+      function multiplicar(valor) {
+        let total = unidades + dezenas * 10 + centenas * 100 + milhares * 1000;
+        total *= valor;
+        atualizarAPartirDeTotal(total);
+      }
+
+      function dividir(valor) {
+        let total = unidades + dezenas * 10 + centenas * 100 + milhares * 1000;
+        if (valor > 0 && total % valor === 0) {
+          total /= valor;
+          atualizarAPartirDeTotal(total);
+        } else {
+          alert(`⚠️ ${total} não é divisível exatamente por ${valor}`);
+        }
+      }
+
+      function zerar() {
+        unidades = 0;
+        dezenas = 0;
+        centenas = 0;
+        milhares = 0;
+        atualizarCena();
+      }
+
+      function executar(valor) {
+        if (operacaoAtual === "soma") somar(valor);
+        else if (operacaoAtual === "subtracao") subtrair(valor);
+        else if (operacaoAtual === "multiplicacao") multiplicar(valor);
+        else if (operacaoAtual === "divisao") dividir(valor);
+      }
+
+      // EVENTOS DOS BOTÕES
+      document.getElementById("btnSoma").onclick = () => {
+        operacaoAtual = "soma";
+        atualizarQuadro();
+      };
+      document.getElementById("btnSub").onclick = () => {
+        operacaoAtual = "subtracao";
+        atualizarQuadro();
+      };
+      document.getElementById("btnMult").onclick = () => {
+        operacaoAtual = "multiplicacao";
+        atualizarQuadro();
+      };
+      document.getElementById("btnDiv").onclick = () => {
+        operacaoAtual = "divisao";
+        atualizarQuadro();
+      };
+      document.getElementById("btnReset").onclick = zerar;
+      document.getElementById("btnExecutar").onclick = () => {
+        let v = parseInt(document.getElementById("valorInput").value);
+        if (v > 0) executar(v);
+        else alert("Digite um valor positivo");
+      };
+
+      // ANIMAÇÃO
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // INICIALIZAR
+      atualizarCena();
+      console.log("🚀 Material Dourado - Versão Final Corrigida!");
+      console.log(
+        "✅ Subtração precisa | ✅ Tema claro/escuro | ✅ Malhas visíveis",
+      );
+    </script>
+  </body>
+</html>
