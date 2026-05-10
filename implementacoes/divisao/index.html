@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InclusivaMente Matemática - Divisão</title>
+    <link rel="shortcut icon" href="../../assets/matematica.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #050510; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        #label-renderer { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 4; }
+        
+        .count-label {
+            font-family: sans-serif; font-weight: 900; font-size: 11px; color: #fff;
+            background: rgba(0, 0, 0, 0.7); padding: 2px 6px; border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        #hud { position: fixed; top: 20px; left: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 10; pointer-events: none; }
+        .card { 
+            background: rgba(15, 15, 40, 0.9); backdrop-filter: blur(10px); 
+            border-radius: 20px; padding: 20px; color: #fff; min-width: 280px; 
+            border: 1px solid rgba(255,255,255,0.1); pointer-events: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .card h3 { font-size: 11px; letter-spacing: 2px; color: #4cc9f0; margin-bottom: 15px; text-transform: uppercase; }
+        .conta-row { display: flex; align-items: center; gap: 10px; justify-content: center; }
+        .conta-row input { 
+            width: 70px; height: 50px; background: #1a1a35; border: 2px solid #4361ee; 
+            border-radius: 12px; color: #fff; font-size: 24px; font-weight: 800; text-align: center; 
+        }
+        #resultado-display { margin: 15px 0; font-size: 28px; font-weight: 900; text-align: center; color: #06d6a0; }
+        .blocos-row { display: flex; gap: 8px; justify-content: center; margin-top: 10px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .bloco-input { width: 60px; height: 40px; background: #252545; border: 2px solid #ffd166; border-radius: 8px; color: #fff; font-size: 18px; font-weight: 800; text-align: center; }
+        
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 8px; color: white; }
+        .btn-primary { background: linear-gradient(135deg, #4361ee, #4cc9f0); }
+        .btn-success { background: linear-gradient(135deg, #06d6a0, #059669); }
+        .btn-danger { background: #ef4444; }
+
+        .num-label { font-family: sans-serif; font-weight: 900; color: #ffd166; font-size: 20px; text-shadow: 2px 2px 4px #000; }
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #4361ee; padding: 15px 30px; border-radius: 50px; font-weight: 700; transition: 0.5s; z-index: 20; color: white; }
+        #toast.show { transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+<div id="label-renderer"></div>
+<div id="hud">
+    <div class="card">
+        <h3>➗ Divisão Espacial</h3>
+        <div class="conta-row">
+            <input type="number" id="total-bolinhas" placeholder="0">
+            <span style="font-size:24px; color:#ffd166">÷</span>
+            <input type="number" id="divisor" placeholder="0">
+        </div>
+        <div id="resultado-display">?</div>
+        
+        <div class="blocos-row">
+            <input class="bloco-input" id="res-total" placeholder="T">
+            <input class="bloco-input" id="res-cada" placeholder="P/G">
+            <input class="bloco-input" id="res-grupos" placeholder="G">
+        </div>
+    </div>
+
+    <div class="card">
+        <button class="btn btn-primary" onclick="formarGrupos()">📦 Agrupar em 3D</button>
+        <button class="btn btn-success" onclick="verificarDivisao()">✅ Verificar</button>
+        <button class="btn btn-danger" onclick="resetar()">🔄 Reiniciar</button>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+// --- TEXTURA PROCEDURAL ---
+function gerarTexturaMadeira() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512; canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#5d4037';
+    ctx.fillRect(0, 0, 512, 512);
+    for (let i = 0; i < 60; i++) {
+        ctx.strokeStyle = `rgba(62, 39, 35, ${Math.random() * 0.5})`;
+        ctx.lineWidth = 1 + Math.random() * 3;
+        ctx.beginPath();
+        let x = Math.random() * 512;
+        ctx.moveTo(x, 0);
+        for (let y = 0; y < 512; y += 10) {
+            x += Math.sin(y * 0.05) * 2;
+            ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+    }
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    return texture;
+}
+
+// --- SETUP CENA ---
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a0a15);
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(4, 5, 8);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+document.body.appendChild(renderer.domElement);
+
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(window.innerWidth, window.innerHeight);
+document.getElementById('label-renderer').appendChild(labelRenderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+const light = new THREE.DirectionalLight(0xffffff, 1.2);
+light.position.set(5, 10, 7);
+light.castShadow = true;
+scene.add(light);
+
+// --- TABULEIRO ---
+const madeiraTex = gerarTexturaMadeira();
+const base = new THREE.Mesh(
+    new THREE.BoxGeometry(4.6, 0.4, 4.6),
+    new THREE.MeshStandardMaterial({ map: madeiraTex, roughness: 0.9 })
+);
+base.position.y = -0.1;
+base.receiveShadow = true;
+scene.add(base);
+
+const topo = new THREE.Mesh(
+    new THREE.BoxGeometry(4.4, 0.05, 4.4),
+    new THREE.MeshStandardMaterial({ map: madeiraTex, color: 0x3e2723 })
+);
+topo.position.y = 0.12;
+topo.receiveShadow = true;
+scene.add(topo);
+
+// --- ESFERAS ---
+const ROWS=10, COLS=10, SPACING=0.38, ORIGIN_X = -1.7, ORIGIN_Z = -1.7;
+let esferas = [], naArea = new Set(), contadas = new Set(), grupoVisuals = [];
+let labelsContagem = new Map();
+
+const sphereGeo = new THREE.SphereGeometry(0.13, 32, 32);
+
+for(let r=0; r<ROWS; r++) {
+    esferas[r] = [];
+    for(let c=0; c<COLS; c++) {
+        const mat = new THREE.MeshStandardMaterial({ color: 0x222244, roughness: 0.3 });
+        const sphere = new THREE.Mesh(sphereGeo, mat);
+        sphere.position.set(ORIGIN_X + c*SPACING, 0.28, ORIGIN_Z + r*SPACING);
+        sphere.castShadow = true;
+        sphere.userData = { id: r * COLS + c };
+        scene.add(sphere);
+        esferas[r][c] = sphere;
+    }
+}
+
+// --- LÓGICA DE GRUPOS (APENAS LETRA G) ---
+function criarMolduraGrupo(indices) {
+    const mainGroup = new THREE.Group();
+    const mat = new THREE.LineBasicMaterial({ color: 0xffd166 });
+    const offset = 0.19; 
+    const linhas = {};
+    const rIdx = [], cIdx = [];
+
+    indices.forEach(idx => {
+        const r = Math.floor(idx / COLS), c = idx % COLS;
+        rIdx.push(r); cIdx.push(c);
+        if (!linhas[r]) linhas[r] = [];
+        linhas[r].push(idx);
+    });
+
+    Object.keys(linhas).forEach(rK => {
+        const r = parseInt(rK), cols = linhas[r];
+        const cMin = cols[0] % COLS, cMax = cols[cols.length-1] % COLS;
+        const xMin = ORIGIN_X + cMin * SPACING - offset, xMax = ORIGIN_X + cMax * SPACING + offset;
+        const zP = ORIGIN_Z + r * SPACING, zMin = zP - offset, zMax = zP + offset;
+
+        const pontos = [
+            new THREE.Vector3(xMin, 0.3, zMin), new THREE.Vector3(xMax, 0.3, zMin),
+            new THREE.Vector3(xMax, 0.3, zMin), new THREE.Vector3(xMax, 0.3, zMax),
+            new THREE.Vector3(xMax, 0.3, zMax), new THREE.Vector3(xMin, 0.3, zMax),
+            new THREE.Vector3(xMin, 0.3, zMax), new THREE.Vector3(xMin, 0.3, zMin)
+        ];
+        mainGroup.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pontos), mat));
+    });
+
+    // Centraliza apenas a letra "G"
+    const avgR = (Math.min(...rIdx) + Math.max(...rIdx)) / 2;
+    const avgC = (Math.min(...cIdx) + Math.max(...cIdx)) / 2;
+    const div = document.createElement('div');
+    div.className = 'num-label';
+    div.textContent = `G`; // Alterado: Apenas G, sem número
+    const label = new CSS2DObject(div);
+    label.position.set(ORIGIN_X + avgC * SPACING, 0.8, ORIGIN_Z + avgR * SPACING);
+    mainGroup.add(label);
+
+    return mainGroup;
+}
+
+function resetarCena() {
+    naArea.clear();
+    contadas.clear();
+    labelsContagem.forEach(l => scene.remove(l));
+    labelsContagem.clear();
+    
+    grupoVisuals.forEach(g => {
+        g.traverse(child => {
+            if(child instanceof CSS2DObject && child.element && child.element.parentNode) {
+                child.element.parentNode.removeChild(child.element);
+            }
+        });
+        scene.remove(g);
+    });
+    grupoVisuals = [];
+
+    const labelDom = document.getElementById('label-renderer').firstChild;
+    if(labelDom) labelDom.innerHTML = '';
+}
+
+window.resetar = function() {
+    resetarCena();
+    atualizarCores();
+    document.getElementById('resultado-display').innerText = "?";
+    ['total-bolinhas', 'divisor', 'res-total', 'res-cada', 'res-grupos'].forEach(id => document.getElementById(id).value = "");
+};
+
+window.formarGrupos = function() {
+    const t = parseInt(document.getElementById('total-bolinhas').value);
+    const d = parseInt(document.getElementById('divisor').value);
+    if(!t || !d || t <= 0 || d <= 0) return mostrarToast("Valores inválidos!");
+
+    resetarCena();
+    for(let i=0; i<t; i++) naArea.add(i);
+
+    const nG = Math.floor(t / d);
+    for(let g=0; g < nG; g++) {
+        const ids = [];
+        for(let i=0; i < d; i++) ids.push(g * d + i);
+        const vG = criarMolduraGrupo(ids);
+        scene.add(vG);
+        grupoVisuals.push(vG);
+    }
+    atualizarCores();
+    mostrarToast(`${nG} grupos formados!`);
+};
+
+window.addEventListener('mousedown', (e) => {
+    if(e.target.closest('#hud')) return;
+    const mouse = new THREE.Vector2((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(esferas.flat());
+
+    if(intersects.length > 0) {
+        const s = intersects[0].object, id = s.userData.id;
+        if(!naArea.has(id)) return;
+
+        if(contadas.has(id)) {
+            contadas.delete(id);
+            if(labelsContagem.has(id)) {
+                scene.remove(labelsContagem.get(id));
+                labelsContagem.delete(id);
+            }
+        } else {
+            contadas.add(id);
+            const div = document.createElement('div');
+            div.className = 'count-label';
+            div.textContent = contadas.size;
+            const l = new CSS2DObject(div);
+            l.position.set(s.position.x, 0.6, s.position.z);
+            scene.add(l);
+            labelsContagem.set(id, l);
+        }
+        atualizarCores();
+    }
+});
+
+function atualizarCores() {
+    esferas.flat().forEach(s => {
+        const id = s.userData.id;
+        if(contadas.has(id)) {
+            s.material.color.set(0x06d6a0);
+            s.material.emissive.set(0x06d6a0).multiplyScalar(0.2);
+        } else if(naArea.has(id)) {
+            s.material.color.set(0x4cc9f0);
+            s.material.emissive.set(0x000000);
+        } else {
+            s.material.color.set(0x222244);
+            s.material.emissive.set(0x000000);
+        }
+    });
+}
+
+window.verificarDivisao = function() {
+    const t = parseInt(document.getElementById('total-bolinhas').value);
+    const d = parseInt(document.getElementById('divisor').value);
+    const rT = parseInt(document.getElementById('res-total').value);
+    const rC = parseInt(document.getElementById('res-cada').value);
+    const rG = parseInt(document.getElementById('res-grupos').value);
+    const q = Math.floor(t / d);
+    document.getElementById('resultado-display').innerText = `${t} ÷ ${d} = ${q}`;
+    if(rT === t && rC === d && rG === q) mostrarToast("🚀 Tudo certo!");
+    else mostrarToast("❌ Erro nos blocos!");
+};
+
+function mostrarToast(m) {
+    const t = document.getElementById('toast');
+    t.innerText = m; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    const time = Date.now() * 0.002;
+    grupoVisuals.forEach((g, i) => g.position.y = Math.sin(time + i) * 0.03);
+    renderer.render(scene, camera);
+    labelRenderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    labelRenderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>

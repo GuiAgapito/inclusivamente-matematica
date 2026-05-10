@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ábaco 3D Profissional - Contraste Máximo</title>
+    <title>InclusivaMente Matemática - Aprendendo a Contar com o Ábaco</title>
+    <link rel="shortcut icon" href="../../assets/matematica.png">
     <style>
         body { margin: 0; overflow: hidden; background: #bae6fd; font-family: 'Segoe UI', sans-serif; }
         #game-ui {
@@ -94,7 +95,7 @@
             const textMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.5, metalness: 0.1 });
 
             // 1. TÍTULO SUPERIOR
-            const titleGeo = new THREE.TextGeometry('ABACO INTERATIVO', { font: font, size: 0.8, height: 0.2 });
+            const titleGeo = new THREE.TextGeometry('ÁBACO INTERATIVO', { font: font, size: 0.8, height: 0.2 });
             titleGeo.computeBoundingBox();
             const titleOffset = -0.5 * (titleGeo.boundingBox.max.x - titleGeo.boundingBox.min.x);
             const titleMesh = new THREE.Mesh(titleGeo, textMat);

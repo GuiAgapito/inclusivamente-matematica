@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InclusivaMente Matemática - Multiplicação</title>
+    <link rel="shortcut icon" href="../../assets/matematica.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0d0d1a;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+        body.light-mode {
+            background: #e0f0ff;
+        }
+        #label-renderer {
+            position: fixed;
+            top: 0; left: 0;
+            pointer-events: none;
+            z-index: 4;
+        }
+        /* AUMENTADO: Números do tabuleiro agora são maiores */
+        .num-label {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 22px; /* Era 13px */
+            font-weight: 900;
+            pointer-events: none;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
+        }
+        .col-label { color: #a0e4ff; }
+        .row-label { color: #ffd166; }
+        .x-label { color: #ff6b6b; font-size: 26px; } /* Era 15px */
+
+        #hud {
+            position: fixed; top: 20px; left: 20px;
+            display: flex; flex-direction: column; gap: 10px;
+            z-index: 10;
+        }
+        .card {
+            background: rgba(10,10,35,0.88);
+            backdrop-filter: blur(18px);
+            border-radius: 16px;
+            padding: 14px 18px;
+            color: #fff;
+            min-width: 232px;
+            transition: 0.2s;
+        }
+        body.light-mode .card {
+            background: rgba(240,248,255,0.9);
+            color: #1e2a2e;
+            border: 1px solid #1E88E5;
+        }
+        .card h3 {
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: #a0e4ff;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        body.light-mode .card h3 { color: #1E88E5; }
+
+        .conta-row {
+            display: flex; align-items: center; gap: 8px;
+        }
+        .conta-row input {
+            width: 52px; height: 42px;
+            background: rgba(160,228,255,0.07);
+            border: 2px solid rgba(160,228,255,0.28);
+            border-radius: 10px;
+            color: #fff; font-size: 24px; font-weight: 800; text-align: center;
+        }
+        body.light-mode .conta-row input {
+            background: white;
+            border-color: #1E88E5;
+            color: #1e2a2e;
+        }
+        .conta-row span { font-size: 24px; font-weight: 800; color: #ffd166; }
+        body.light-mode .conta-row span { color: #FF8C00; }
+
+        #resultado-display {
+            margin-top: 10px; font-size: 30px; font-weight: 900;
+            text-align: center; color: #06d6a0;
+        }
+        body.light-mode #resultado-display { color: #2e7d64; }
+
+        .blocos-row {
+            display: flex; gap: 6px; justify-content: center;
+            margin-top: 8px;
+        }
+        .bloco-col { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+        .bloco-label { font-size: 10px; color: #888; }
+        .bloco-input {
+            width: 54px; height: 36px;
+            background: rgba(255,209,102,0.08);
+            border: 2px solid rgba(255,209,102,0.3);
+            border-radius: 8px;
+            color: #fff; font-size: 18px; font-weight: 800; text-align: center;
+        }
+        body.light-mode .bloco-input {
+            background: white;
+            border-color: #FFCA28;
+            color: #1e2a2e;
+        }
+        .op-sym { font-size: 22px; font-weight: 900; color: #ffd166; padding-top: 6px; }
+        body.light-mode .op-sym { color: #FF8C00; }
+
+        .btn {
+            width: 100%; padding: 10px; border: none; border-radius: 10px;
+            font-size: 13px; font-weight: 700; cursor: pointer;
+            transition: transform .15s;
+        }
+        .btn:active { transform: scale(.96); }
+        .btn-primary { background: linear-gradient(135deg,#4cc9f0,#4361ee); color:#fff; }
+        .btn-success { background: linear-gradient(135deg,#06d6a0,#0b8f6a); color:#fff; }
+        .btn-danger  { background: linear-gradient(135deg,#ff6b6b,#c0392b); color:#fff; }
+        .btn-light   { background: #ffd166; color:#1e2a2e; }
+
+        #contagem-info { font-size: 12px; color: #ffd166; text-align: center; margin-top: 8px; }
+        body.light-mode #contagem-info { color: #E65100; }
+
+        .legenda { display: flex; flex-direction: column; gap: 7px; font-size: 12px; }
+        .legenda-item { display: flex; align-items: center; gap: 9px; color: #bbb; }
+        body.light-mode .legenda-item { color: #2c3e2f; }
+        .dot { width: 13px; height: 13px; border-radius: 50%; }
+
+        #toast {
+            position: fixed; bottom: 30px; left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #06d6a0;
+            padding: 13px 28px; border-radius: 50px;
+            font-weight: 700; transition: transform .4s;
+            z-index: 20; color: #fff;
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+<canvas id="three-canvas" style="position:fixed;top:0;left:0;display:block;"></canvas>
+<div id="label-renderer"></div>
+
+<div id="hud">
+    <div class="card">
+        <h3>🔢 Multiplicação</h3>
+        <div class="conta-row">
+            <input type="number" id="num-a" min="1" max="10" value="2">
+            <span>×</span>
+            <input type="number" id="num-b" min="1" max="10" value="3">
+            <span>=</span>
+        </div>
+        <div id="resultado-display">?</div>
+        <div class="blocos-row">
+            <div class="bloco-col"><input class="bloco-input" id="bloco-a" placeholder="?"><div class="bloco-label">1º nº</div></div>
+            <div class="op-sym">×</div>
+            <div class="bloco-col"><input class="bloco-input" id="bloco-b" placeholder="?"><div class="bloco-label">2º nº</div></div>
+            <div class="op-sym">=</div>
+            <div class="bloco-col"><input class="bloco-input" id="bloco-res" placeholder="?"><div class="bloco-label">resultado</div></div>
+        </div>
+    </div>
+    <div class="card">
+        <h3>⚙️ Ações</h3>
+        <div style="display:flex;flex-direction:column;gap:8px">
+            <button class="btn btn-primary" onclick="delimitar()">🔲 Delimitar área</button>
+            <button class="btn btn-success" onclick="verificarResposta()">✅ Verificar resposta</button>
+            <button class="btn btn-danger"  onclick="resetar()">🔄 Limpar tudo</button>
+            <button class="btn btn-light" id="toggleThemeBtn">☀️ Modo Claro/Escuro</button>
+        </div>
+        <div id="contagem-info">Clique nas bolinhas para contar</div>
+    </div>
+    <div class="card">
+        <h3>🎨 Legenda</h3>
+        <div class="legenda">
+            <div class="legenda-item"><div class="dot" style="background:#5c9eff"></div> Bolinha normal</div>
+            <div class="legenda-item"><div class="dot" style="background:#4cc9f0"></div> Dentro da área</div>
+            <div class="legenda-item"><div class="dot" style="background:#06d6a0"></div> Contada ✓</div>
+            <div class="legenda-item"><div class="dot" style="background:#ffd166"></div> Hover</div>
+        </div>
+    </div>
+</div>
+<div id="toast"></div>
+
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+// --- Setup básico ---
+const canvas = document.getElementById('three-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.setClearColor(0x0d0d1a, 1);
+
+const labelRenderer = new CSS2DRenderer({ element: document.getElementById('label-renderer') });
+labelRenderer.setSize(innerWidth, innerHeight);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x0d0d1a, 0.05);
+
+const camera = new THREE.PerspectiveCamera(42, innerWidth/innerHeight, 0.05, 500);
+camera.position.set(1.2, 1.8, 4.2);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.target.set(0,0.6,0);
+
+// --- Iluminação ---
+const ambientLight = new THREE.AmbientLight(0x8090c0, 0.9);
+const mainLight = new THREE.DirectionalLight(0xfff0d0, 1.4);
+mainLight.position.set(3,5,2.5);
+mainLight.castShadow = true;
+const fillLight = new THREE.PointLight(0x88aaff, 0.7);
+fillLight.position.set(1.5,1,1.8);
+const rimLight = new THREE.PointLight(0xffaa77, 0.5);
+rimLight.position.set(-1.2,1.5,-2);
+const spotLight = new THREE.SpotLight(0xcceeff, 0.5);
+spotLight.position.set(0,2.2,1.2);
+scene.add(ambientLight, mainLight, fillLight, rimLight, spotLight);
+
+// --- Estrelas ---
+let stars = null;
+(function createStars() {
+    const starGeo = new THREE.BufferGeometry();
+    const count = 1200;
+    const positions = new Float32Array(count * 3);
+    for (let i=0; i<count; i++) {
+        positions[i*3] = (Math.random() - 0.5) * 200;
+        positions[i*3+1] = (Math.random() - 0.5) * 80;
+        positions[i*3+2] = (Math.random() - 0.5) * 100 - 50;
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xaaccff, size: 0.08, transparent: true, opacity: 0.6 }));
+    scene.add(stars);
+})();
+
+// --- Grade de bolinhas ---
+const ROWS=10, COLS=10, SPACING=0.28, ORIGIN_X=-1.24, ORIGIN_Y=0.90, BALL_R=0.088;
+const COR_NORMAL=new THREE.Color(0x5c9eff), COR_AREA=new THREE.Color(0x4cc9f0), COR_CONTADA=new THREE.Color(0x06d6a0), COR_HOVER=new THREE.Color(0xffd166);
+let bolinhas=[], contadas=new Set(), naArea=new Set(), hoveredBall=null, linhaDelim=null;
+
+function criarMaterialClaro(cor) {
+    return new THREE.MeshStandardMaterial({ color: cor, roughness:0.35, metalness:0.15, emissive:cor.clone().multiplyScalar(0.1) });
+}
+const geoEsfera = new THREE.SphereGeometry(BALL_R, 32, 32);
+const gradeGroup = new THREE.Group();
+scene.add(gradeGroup);
+for(let r=1; r<=ROWS; r++) {
+    bolinhas[r]=[];
+    for(let c=1; c<=COLS; c++) {
+        const mat = criarMaterialClaro(COR_NORMAL);
+        const mesh = new THREE.Mesh(geoEsfera, mat);
+        mesh.position.set(ORIGIN_X+(c-1)*SPACING, ORIGIN_Y-(r-1)*SPACING, 0.03);
+        mesh.castShadow = true;
+        mesh.userData = { row: r, col: c, key:`${r}_${c}` };
+        gradeGroup.add(mesh);
+        bolinhas[r][c] = mesh;
+    }
+}
+
+// --- Plano de fundo ---
+let fundoPlano = null;
+function criarPlanoBase(corHex) {
+    const w = COLS*SPACING + SPACING*0.7;
+    const h = ROWS*SPACING + SPACING*1.3;
+    const canvasTex = document.createElement('canvas');
+    canvasTex.width=512; canvasTex.height=512;
+    const ctx = canvasTex.getContext('2d');
+    ctx.fillStyle = corHex;
+    ctx.fillRect(0,0,512,512);
+    ctx.strokeStyle = '#88aadd';
+    ctx.lineWidth = 1.5;
+    for(let i=0;i<=10;i++) {
+        ctx.beginPath(); ctx.moveTo(i*51.2,0); ctx.lineTo(i*51.2,512); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0,i*51.2); ctx.lineTo(512,i*51.2); ctx.stroke();
+    }
+    const tex = new THREE.CanvasTexture(canvasTex);
+    const material = new THREE.MeshStandardMaterial({ map:tex, roughness:0.5, metalness:0.05, color:0xeeeeff });
+    const planeGeo = new THREE.PlaneGeometry(w, h);
+    const plane = new THREE.Mesh(planeGeo, material);
+    plane.position.set(ORIGIN_X+(COLS-1)*SPACING/2, ORIGIN_Y-(ROWS-1)*SPACING/2, -0.06);
+    plane.receiveShadow = true;
+    return plane;
+}
+function atualizarPlanoFundo(cor) {
+    if (fundoPlano) gradeGroup.remove(fundoPlano);
+    fundoPlano = criarPlanoBase(cor);
+    gradeGroup.add(fundoPlano);
+}
+atualizarPlanoFundo('#d4e4ff');
+
+// --- Números CSS2D ---
+function addCSSLabels() {
+    for(let c=1;c<=COLS;c++) {
+        const div=document.createElement('div'); div.className='num-label col-label'; div.textContent=c;
+        const obj=new CSS2DObject(div); obj.position.set(ORIGIN_X+(c-1)*SPACING, ORIGIN_Y+SPACING*0.85, 0.04);
+        gradeGroup.add(obj);
+    }
+    for(let r=1;r<=ROWS;r++) {
+        const div=document.createElement('div'); div.className='num-label row-label'; div.textContent=r;
+        const obj=new CSS2DObject(div); obj.position.set(ORIGIN_X-SPACING*0.92, ORIGIN_Y-(r-1)*SPACING, 0.04);
+        gradeGroup.add(obj);
+    }
+    const divX=document.createElement('div'); divX.className='num-label x-label'; divX.textContent='×';
+    const objX=new CSS2DObject(divX); objX.position.set(ORIGIN_X-SPACING*0.92, ORIGIN_Y+SPACING*0.85, 0.04);
+    gradeGroup.add(objX);
+}
+addCSSLabels();
+
+// --- Lógica e Interação ---
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+function todasBolinhas() { let arr=[]; for(let r=1;r<=ROWS;r++) for(let c=1;c<=COLS;c++) arr.push(bolinhas[r][c]); return arr; }
+function atualizarCor(mesh) {
+    const key=mesh.userData.key;
+    const isHv = hoveredBall===mesh;
+    let cor = isHv ? COR_HOVER : (contadas.has(key)?COR_CONTADA : (naArea.has(key)?COR_AREA:COR_NORMAL));
+    mesh.material.color.set(cor);
+    mesh.material.emissive.set(cor).multiplyScalar(0.1);
+}
+
+window.addEventListener('mousemove', e=>{
+    mouse.x = (e.clientX/innerWidth)*2-1;
+    mouse.y = -(e.clientY/innerHeight)*2+1;
+});
+
+window.addEventListener('click', e=>{
+    if(e.target.closest('#hud')) return;
+    raycaster.setFromCamera(mouse,camera);
+    const hits=raycaster.intersectObjects(todasBolinhas());
+    if(hits.length){
+        const mesh = hits[0].object;
+        const key = mesh.userData.key;
+        if(naArea.has(key)){
+            contadas.has(key) ? contadas.delete(key) : contadas.add(key);
+            atualizarCor(mesh);
+            atualizarInfo();
+        }
+    }
+});
+
+function atualizarInfo() { document.getElementById('contagem-info').innerHTML = `Contadas: ${contadas.size} de ${naArea.size} bolinhas`; }
+
+window.delimitar = function() {
+    let a=Math.min(Math.max(parseInt(document.getElementById('num-a').value)||1,1),10);
+    let b=Math.min(Math.max(parseInt(document.getElementById('num-b').value)||1,1),10);
+    naArea.clear(); contadas.clear();
+    if(linhaDelim) scene.remove(linhaDelim);
+    for(let r=1;r<=a;r++) for(let c=1;c<=b;c++) naArea.add(`${r}_${c}`);
+    todasBolinhas().forEach(m=>atualizarCor(m));
+    const pad=0.06, x1=ORIGIN_X-BALL_R-pad, x2=ORIGIN_X+(b-1)*SPACING+BALL_R+pad, y1=ORIGIN_Y+BALL_R+pad, y2=ORIGIN_Y-(a-1)*SPACING-BALL_R-pad;
+    const pts=[ new THREE.Vector3(x1,y1,0.12), new THREE.Vector3(x2,y1,0.12), new THREE.Vector3(x2,y1,0.12), new THREE.Vector3(x2,y2,0.12), new THREE.Vector3(x2,y2,0.12), new THREE.Vector3(x1,y2,0.12), new THREE.Vector3(x1,y2,0.12), new THREE.Vector3(x1,y1,0.12) ];
+    linhaDelim = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({color:0xff6b6b}));
+    scene.add(linhaDelim);
+    atualizarInfo();
+    mostrarToast(`Área ${a} × ${b} delimitada!`,'#ff6b6b');
+};
+
+window.verificarResposta = function() {
+    let a=parseInt(document.getElementById('num-a').value)||0, b=parseInt(document.getElementById('num-b').value)||0, res=a*b;
+    document.getElementById('resultado-display').innerHTML = `${a} × ${b} = ${res}`;
+    let ba=parseInt(document.getElementById('bloco-a').value), bb=parseInt(document.getElementById('bloco-b').value), br=parseInt(document.getElementById('bloco-res').value);
+    if(ba===a && bb===b && br===res) mostrarToast('🎉 Perfeito!','#06d6a0');
+    else if(contadas.size===res) mostrarToast('✅ Bolinhas certas! Preencha os blocos.','#ffd166');
+    else mostrarToast('❌ Tente novamente!','#ff6b6b');
+};
+
+window.resetar = function() {
+    naArea.clear(); contadas.clear();
+    if(linhaDelim) scene.remove(linhaDelim);
+    todasBolinhas().forEach(m=>atualizarCor(m));
+    document.getElementById('resultado-display').innerHTML = '?';
+    ['bloco-a','bloco-b','bloco-res'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('contagem-info').innerHTML = 'Clique nas bolinhas para contar';
+    linhaDelim=null;
+};
+
+function mostrarToast(msg,cor){ let t=document.getElementById('toast'); t.textContent=msg; t.style.background=cor; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+
+// --- Alternância Modo Claro/Escuro ---
+let lightMode = false;
+window.toggleLightMode = function() {
+    lightMode = !lightMode;
+    if (lightMode) {
+        document.body.classList.add('light-mode');
+        renderer.setClearColor(0xe0f0ff);
+        scene.background = new THREE.Color(0xe0f0ff);
+        if (scene.fog) scene.fog.color.setHex(0xe0f0ff);
+        if (stars) stars.visible = false;
+        ambientLight.intensity = 1.2;
+        mainLight.intensity = 1.8;
+        atualizarPlanoFundo('#f8faff');
+    } else {
+        document.body.classList.remove('light-mode');
+        renderer.setClearColor(0x0d0d1a);
+        scene.background = new THREE.Color(0x0d0d1a);
+        if (scene.fog) scene.fog.color.setHex(0x0d0d1a);
+        if (stars) stars.visible = true;
+        ambientLight.intensity = 0.9;
+        mainLight.intensity = 1.4;
+        atualizarPlanoFundo('#d4e4ff');
+    }
+    todasBolinhas().forEach(m => atualizarCor(m));
+};
+
+document.getElementById('toggleThemeBtn').addEventListener('click', window.toggleLightMode);
+
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    raycaster.setFromCamera(mouse, camera);
+    const hits = raycaster.intersectObjects(todasBolinhas());
+    const newHov = (hits.length && naArea.has(hits[0].object.userData.key)) ? hits[0].object : null;
+    if (newHov !== hoveredBall) {
+        if (hoveredBall) atualizarCor(hoveredBall);
+        hoveredBall = newHov;
+        if (hoveredBall) atualizarCor(hoveredBall);
+        renderer.domElement.style.cursor = newHov ? 'pointer' : 'default';
+    }
+    renderer.render(scene, camera);
+    labelRenderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+    camera.aspect = innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+    labelRenderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
