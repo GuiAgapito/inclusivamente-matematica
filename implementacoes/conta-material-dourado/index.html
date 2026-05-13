@@ -13,7 +13,6 @@
         transition: background-color 0.3s ease;
       }
 
-      /* TEMA PADRÃO (ESCURO) */
       body.dark {
         background-color: #0a0a2a;
       }
@@ -22,7 +21,6 @@
         background-color: #d4d8e8;
       }
 
-      /* QUADRO PEDAGÓGICO */
       .quadro-pedagogico {
         position: absolute;
         top: 15px;
@@ -160,7 +158,6 @@
         color: #2e7d32;
       }
 
-      /* PAINEL DE CONTROLE */
       .controls {
         position: absolute;
         bottom: 15px;
@@ -343,7 +340,6 @@
     </style>
   </head>
   <body class="dark">
-    <!-- QUADRO PEDAGÓGICO -->
     <div class="quadro-pedagogico" id="quadroPedagogico">
       <h3>📖 QUADRO DE VALORES</h3>
       <div class="operacao-visual" id="operacaoVisual">0</div>
@@ -352,7 +348,6 @@
       <div class="resultado-box">TOTAL: <span id="valorTotal">0</span></div>
     </div>
 
-    <!-- PAINEL DE CONTROLE -->
     <div class="controls">
       <div class="counter-group">
         <span class="counter unidade" id="unidadeCount">0U</span>
@@ -398,7 +393,6 @@
       import * as THREE from "three";
       import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-      // --- CONFIGURAÇÕES GLOBAIS ---
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0x0a0a2a);
       scene.fog = new THREE.FogExp2(0x0a0a2a, 0.008);
@@ -422,7 +416,6 @@
       controls.target.set(0, 2.5, 0);
       controls.zoomSpeed = 1.0;
 
-      // --- LUZES ---
       const ambientLight = new THREE.AmbientLight(0x404060, 0.6);
       scene.add(ambientLight);
       const dirLight = new THREE.DirectionalLight(0xfff5e6, 1.2);
@@ -438,12 +431,10 @@
       backLight.position.set(0, 3, -6);
       scene.add(backLight);
 
-      // GRADE (chão)
       const gridHelper = new THREE.GridHelper(20, 20, 0x88aaff, 0x335588);
       gridHelper.position.y = -0.2;
       scene.add(gridHelper);
 
-      // --- TEMA CLARO/ESCURO ---
       let temaAtual = "dark";
       function alternarTema() {
         const body = document.body;
@@ -467,7 +458,6 @@
         .getElementById("btnTema")
         .addEventListener("click", alternarTema);
 
-      // --- PARÂMETROS DE CONSTRUÇÃO ---
       const CUBE_SIZE = 0.45;
 
       const COR_UNIDADE = 0xffd700;
@@ -494,8 +484,6 @@
       });
 
       const meshMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
-
-      // FUNÇÕES DE CRIAÇÃO (COM MALHA VISÍVEL)
 
       function criarUnidade(x, z, yBase = 0.2) {
         const group = new THREE.Group();
@@ -584,7 +572,6 @@
         return group;
       }
 
-      // POSICIONAMENTO DAS PEÇAS
       let unidades = 0,
         dezenas = 0,
         centenas = 0,
@@ -603,7 +590,6 @@
       const posCentenas = { startX: 0.5, startZ: -1.5, cols: 2, step: 5.5 };
       const posMilhares = { startX: -2, startZ: 3.5, stepX: 6.5 };
 
-      // QUADRO PEDAGÓGICO
       function numeroPorExtenso(n) {
         if (n === 0) return "zero";
         if (n === 1) return "um";
@@ -751,7 +737,6 @@
         atualizarDisplay();
       }
 
-      // FUNÇÃO PRINCIPAL: ATUALIZAR A PARTIR DO TOTAL
       function atualizarAPartirDeTotal(totalUnidades) {
         let resto = totalUnidades;
 
@@ -767,7 +752,6 @@
         atualizarCena();
       }
 
-      // OPERAÇÕES
       function somar(valor) {
         let total = unidades + dezenas * 10 + centenas * 100 + milhares * 1000;
         total += valor;
@@ -815,7 +799,6 @@
         else if (operacaoAtual === "divisao") dividir(valor);
       }
 
-      // EVENTOS DOS BOTÕES
       document.getElementById("btnSoma").onclick = () => {
         operacaoAtual = "soma";
         atualizarQuadro();
@@ -839,7 +822,6 @@
         else alert("Digite um valor positivo");
       };
 
-      // ANIMAÇÃO
       function animate() {
         requestAnimationFrame(animate);
         controls.update();
@@ -853,7 +835,6 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
 
-      // INICIALIZAR
       atualizarCena();
       console.log("🚀 Material Dourado - Versão Final Corrigida!");
       console.log(

@@ -22,17 +22,16 @@
             pointer-events: none;
             z-index: 4;
         }
-        /* AUMENTADO: Números do tabuleiro agora são maiores */
         .num-label {
             font-family: 'Segoe UI', sans-serif;
-            font-size: 22px; /* Era 13px */
+            font-size: 22px;
             font-weight: 900;
             pointer-events: none;
             text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
         }
         .col-label { color: #a0e4ff; }
         .row-label { color: #ffd166; }
-        .x-label { color: #ff6b6b; font-size: 26px; } /* Era 15px */
+        .x-label { color: #ff6b6b; font-size: 26px; } 
 
         #hud {
             position: fixed; top: 20px; left: 20px;
@@ -197,7 +196,6 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
-// --- Setup básico ---
 const canvas = document.getElementById('three-canvas');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setSize(innerWidth, innerHeight);
@@ -216,7 +214,6 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.target.set(0,0.6,0);
 
-// --- Iluminação ---
 const ambientLight = new THREE.AmbientLight(0x8090c0, 0.9);
 const mainLight = new THREE.DirectionalLight(0xfff0d0, 1.4);
 mainLight.position.set(3,5,2.5);
@@ -229,7 +226,6 @@ const spotLight = new THREE.SpotLight(0xcceeff, 0.5);
 spotLight.position.set(0,2.2,1.2);
 scene.add(ambientLight, mainLight, fillLight, rimLight, spotLight);
 
-// --- Estrelas ---
 let stars = null;
 (function createStars() {
     const starGeo = new THREE.BufferGeometry();
@@ -245,7 +241,6 @@ let stars = null;
     scene.add(stars);
 })();
 
-// --- Grade de bolinhas ---
 const ROWS=10, COLS=10, SPACING=0.28, ORIGIN_X=-1.24, ORIGIN_Y=0.90, BALL_R=0.088;
 const COR_NORMAL=new THREE.Color(0x5c9eff), COR_AREA=new THREE.Color(0x4cc9f0), COR_CONTADA=new THREE.Color(0x06d6a0), COR_HOVER=new THREE.Color(0xffd166);
 let bolinhas=[], contadas=new Set(), naArea=new Set(), hoveredBall=null, linhaDelim=null;
@@ -269,7 +264,6 @@ for(let r=1; r<=ROWS; r++) {
     }
 }
 
-// --- Plano de fundo ---
 let fundoPlano = null;
 function criarPlanoBase(corHex) {
     const w = COLS*SPACING + SPACING*0.7;
@@ -300,7 +294,6 @@ function atualizarPlanoFundo(cor) {
 }
 atualizarPlanoFundo('#d4e4ff');
 
-// --- Números CSS2D ---
 function addCSSLabels() {
     for(let c=1;c<=COLS;c++) {
         const div=document.createElement('div'); div.className='num-label col-label'; div.textContent=c;
@@ -318,7 +311,6 @@ function addCSSLabels() {
 }
 addCSSLabels();
 
-// --- Lógica e Interação ---
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 function todasBolinhas() { let arr=[]; for(let r=1;r<=ROWS;r++) for(let c=1;c<=COLS;c++) arr.push(bolinhas[r][c]); return arr; }
@@ -388,7 +380,6 @@ window.resetar = function() {
 
 function mostrarToast(msg,cor){ let t=document.getElementById('toast'); t.textContent=msg; t.style.background=cor; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
 
-// --- Alternância Modo Claro/Escuro ---
 let lightMode = false;
 window.toggleLightMode = function() {
     lightMode = !lightMode;

@@ -253,13 +253,11 @@
   </div>
   <div id="hint">🖱️ Arraste = girar &nbsp;|&nbsp; 🔍 Scroll = zoom<br>✨ Formas planas com rotação 3D</div>
 
-  <!-- Libs Three.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
   <script>
-    // ---------- CONFIGURAÇÃO DO RENDERIZADOR ----------
     const canvas = document.getElementById('c');
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -280,7 +278,6 @@
     controls.target.set(0, 1.2, 0);
     controls.maxPolarAngle = Math.PI * 0.85;
     
-    // ---------- ILUMINAÇÃO ----------
     scene.add(new THREE.AmbientLight(0xffffff, 0.65));
     const sun = new THREE.DirectionalLight(0xffffff, 1.5);
     sun.position.set(8, 14, 10);
@@ -294,7 +291,6 @@
     rimLight.position.set(5, 3, -8);
     scene.add(rimLight);
     
-    // ---------- CHÃO E GRID ----------
     const floorMat = new THREE.MeshStandardMaterial({ color: 0x11223a, roughness: 0.85, metalness: 0.05 });
     const floorPlane = new THREE.Mesh(new THREE.PlaneGeometry(45, 45), floorMat);
     floorPlane.rotation.x = -Math.PI/2;
@@ -304,16 +300,14 @@
     gridHelper.position.y = 0.008;
     scene.add(gridHelper);
     
-    // ---------- ESTADO GLOBAL ----------
-    let currentGroup = null;      // grupo que contém a forma atual
-    let meshesList = [];          // todas as faces / planos
-    let edgesList = [];           // linhas de aresta/contorno
-    let vertsList = [];           // esferas de vértices
+    let currentGroup = null;      
+    let meshesList = [];          
+    let edgesList = [];           
+    let vertsList = [];           
     let isPlanified = false;
     let currentShapeId = 'cube';
-    let currentShapeType = 'solid'; // 'solid' ou 'plane'
+    let currentShapeType = 'solid'; 
     
-    // Base de dados descritiva
     const SHAPES_INFO = {
       cube: { name:'Cubo', props:'6 faces · 12 arestas · 8 vértices', desc:'Poliedro regular – faces quadradas', color:0x4cc9f0, type:'solid' },
       sphere: { name:'Esfera', props:'Superfície curva · infinitos pontos', desc:'Todos os pontos à mesma distância do centro', color:0xffb703, type:'solid' },
@@ -329,7 +323,6 @@
       hexagon: { name:'Hexágono Regular', props:'6 lados iguais · 120° internos', desc:'Muito encontrado na natureza (colmeias)', color:0xf0b43c, type:'plane' }
     };
     
-    // Material bonito para faces planas (double side para visão 360°)
     function makePlaneMaterial(color, opacity=0.85) {
       return new THREE.MeshStandardMaterial({
         color: color,
@@ -340,10 +333,9 @@
         side: THREE.DoubleSide
       });
     }
-    
-    // ---- Utilitários para adicionar arestas e vértices a partir de pontos ----
+        
     function addEdgesFromPoints(points, yOffset, color=0xffffff) {
-      const linePoints = points.concat([points[0]]); // fecha o polígono
+      const linePoints = points.concat([points[0]]); 
       const positions = [];
       for (let i = 0; i < linePoints.length-1; i++) {
         const p1 = linePoints[i];
@@ -370,7 +362,7 @@
       });
     }
     
-    // ---------- CRIAÇÃO DAS FORMAS PLANAS (2D) ----------
+  
     function createSquare() {
       const side = 3.2;
       const yBase = 0;
@@ -383,7 +375,6 @@
       meshesList.push(mesh);
       currentGroup.add(mesh);
       
-      // Vértices do quadrado (no plano XZ)
       const half = side/2;
       const points = [
         new THREE.Vector3(-half, 0, -half), new THREE.Vector3( half, 0, -half),
@@ -422,7 +413,6 @@
       meshesList.push(mesh);
       currentGroup.add(mesh);
       
-      // Aresta: círculo com 48 pontos
       const points = [];
       const segments = 64;
       for (let i = 0; i <= segments; i++) {
@@ -432,7 +422,6 @@
         points.push(new THREE.Vector3(x, 0, z));
       }
       addEdgesFromPoints(points, 0.03);
-      // Vértices: apenas alguns pontos representativos (12)
       const vertPoints = [];
       for (let i = 0; i < 12; i++) {
         const angle = (i / 12) * Math.PI * 2;
@@ -445,14 +434,13 @@
     
     function createTriangle() {
       const side = 3.5;
-      const heightEq = side * Math.sqrt(3) / 2;  // ≈3.03
-      const centerY = -heightEq/3; // centralizar no eixo Z
+      const heightEq = side * Math.sqrt(3) / 2;
+      const centerY = -heightEq/3;
       const points = [
-        new THREE.Vector3(0, 0, heightEq * 0.66),                // topo
-        new THREE.Vector3(-side/2, 0, -heightEq * 0.33),        // esq baixo
-        new THREE.Vector3( side/2, 0, -heightEq * 0.33)         // dir baixo
+        new THREE.Vector3(0, 0, heightEq * 0.66),               
+        new THREE.Vector3(-side/2, 0, -heightEq * 0.33),        
+        new THREE.Vector3( side/2, 0, -heightEq * 0.33)         
       ];
-      // Construir geometria personalizada para a face
       const positions = [];
       points.forEach(p => { positions.push(p.x, p.y+0.02, p.z); });
       const indices = [0,1,2];
@@ -493,7 +481,6 @@
       addVerticesFromPoints(points, 0.04);
     }
     
-    // ---------- SÓLIDOS 3D (CONTEÚDO ORIGINAL ADAPTADO) ----------
     function addEdgesFromGeometry(geometry, yOffset=0) {
       const edges = new THREE.EdgesGeometry(geometry);
       const lines = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff }));
@@ -540,8 +527,7 @@
     }
     function createCuboidSolid() { const g=new THREE.BoxGeometry(4,2,3); addMeshSolid(g,0xff6496,1); addEdgesFromGeometry(g,1); addVerticesFromGeometry(g,1); }
     
-    // ---------- PLANIFICAÇÕES (SÓ PARA SÓLIDOS) ----------
-    function planCube(){ /* modo genérico, apenas para não quebrar código */ createCubeSolid(); isPlanified=false; }
+    function planCube(){ createCubeSolid(); isPlanified=false; }
     function planSphere(){ createSphereSolid(); isPlanified=false; }
     function planCone(){ createConeSolid(); isPlanified=false; }
     function planCylinder(){ createCylinderSolid(); isPlanified=false; }
@@ -549,7 +535,7 @@
     function planTriPyramid(){ createTriPyramidSolid(); isPlanified=false; }
     function planCuboid(){ createCuboidSolid(); isPlanified=false; }
     
-    // ---------- GERENCIAMENTO DE CENA ----------
+
     function clearScene() {
       if (currentGroup) scene.remove(currentGroup);
       currentGroup = null;
@@ -566,8 +552,7 @@
       currentShapeId = shapeId;
       const info = SHAPES_INFO[shapeId];
       currentShapeType = info.type;
-      
-      // Disable/enable planification button
+          
       const planBtn = document.getElementById('plan-btn');
       if (info.type === 'plane') {
         planBtn.disabled = true;
@@ -577,7 +562,6 @@
         planBtn.textContent = '📐 Ver Planificação';
       }
       
-      // Chamar função construtora
       switch(shapeId) {
         case 'cube': createCubeSolid(); break;
         case 'sphere': createSphereSolid(); break;
@@ -601,9 +585,7 @@
     
     function togglePlanification() {
       if (currentShapeType === 'plane') return;
-      if (!isPlanified) {
-        // Simula planificação: apenas recria o sólido normal (já que o foco são formas planas 2D)
-        // mas mantemos a ideia de alternar – no contexto atual, planificação não é prioridade, apenas não quebra.
+      if (!isPlanified) {        
         buildShape(currentShapeId);
         isPlanified = false;
       } else {
@@ -639,7 +621,6 @@
       buildShape(type);
     };
     
-    // ---------- RESIZE E ANIMAÇÃO ----------
     function onResize() {
       const w = window.innerWidth - 280;
       const h = window.innerHeight;
@@ -655,17 +636,14 @@
       requestAnimationFrame(animate);
       controls.update();
       if (currentGroup && !isPlanified && currentShapeType !== 'plane') {
-        // rotação suave apenas para sólidos (opcional)
         currentGroup.rotation.y += 0.0022;
-      } else if (currentGroup && currentShapeType === 'plane') {
-        // formas planas também giram suavemente (dá sensação de imersão)
+      } else if (currentGroup && currentShapeType === 'plane') {    
         currentGroup.rotation.y += 0.0022;
       }
       renderer.render(scene, camera);
     }
     animate();
-    
-    // inicializa com cubo
+        
     buildShape('cube');
   </script>
 </body>

@@ -267,7 +267,6 @@
   🔍 Scroll para zoom
 </div>
 
-<!-- Scripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
@@ -378,8 +377,6 @@ function makeCanvasTex(fn, w = 256, h = 256) {
   return new THREE.CanvasTexture(cv);
 }
 
-// !!! LEMBRAR AMANHÃ: colocar a posição dos blocos para obedecer a forma padrão de operação ensinada nas escolas (fatores em cima e resultado embaixo da igualdade)
-
 const X_TENS  = -2.2;
 const X_UNITS =  2.2;
 const Z_N1    = -3.6;
@@ -445,12 +442,12 @@ floorLabel('Nº 2', -7.0, Z_N2, 'rgba(255,255,255,0.4)', 24, 140, 50);
 floorLabel('=', -7.0, Z_RES, '#ffd166', 36, 80, 60);
 
 const COLORS = {
-  ten:      0x457b9d,   // AZUL
-  unit:     0xf4a261,   // LARANJA
-  carryTen: 0x2a9d8f,   // VERDE AZULADO
-  carryUni: 0x5cc8b4,   // AZUL CLARO
-  subClr:   0xef5350,   // VERMELHO
-  subTen:   0xc62828,   // VERMELHO SÓ QUE MAIS ESCURO
+  ten:      0x457b9d,   
+  unit:     0xf4a261,   
+  carryTen: 0x2a9d8f,   
+  carryUni: 0x5cc8b4,   
+  subClr:   0xef5350,   
+  subTen:   0xc62828,   
 };
 
 function hexStr(hex) { return '#' + hex.toString(16).padStart(6, '0'); }
@@ -606,7 +603,6 @@ async function animateAddition(n1, n2) {
   const resU    = unitSum % 10;
   const resT    = t1 + t2 + carry;
 
-// PASSO A PASSO DA OPERAÇÃO ESCOLHIDA COMO SOMA
   step('Passo 1 / 4', `Representando ${n1} com blocos! Azul = dezena (10), Laranja = unidade (1)`);
   placeNumber(n1, Z_N1, STATE.n1t, STATE.n1u, COLORS.ten, COLORS.unit, true);
   await wait(Math.max(t1, u1) * 85 + 750);
@@ -793,7 +789,6 @@ async function animateSubtraction(n1, n2) {
 async function calculate() {
   if (STATE.animating) return;
 
-  // Clear and restart
   clearArr(STATE.n1t); clearArr(STATE.n1u);
   clearArr(STATE.n2t); clearArr(STATE.n2u);
   clearArr(STATE.extra);

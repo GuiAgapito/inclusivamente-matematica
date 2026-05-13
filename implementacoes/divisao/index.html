@@ -86,7 +86,6 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
-// --- TEXTURA PROCEDURAL ---
 function gerarTexturaMadeira() {
     const canvas = document.createElement('canvas');
     canvas.width = 512; canvas.height = 512;
@@ -110,7 +109,6 @@ function gerarTexturaMadeira() {
     return texture;
 }
 
-// --- SETUP CENA ---
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0a0a15);
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -134,7 +132,6 @@ light.position.set(5, 10, 7);
 light.castShadow = true;
 scene.add(light);
 
-// --- TABULEIRO ---
 const madeiraTex = gerarTexturaMadeira();
 const base = new THREE.Mesh(
     new THREE.BoxGeometry(4.6, 0.4, 4.6),
@@ -152,7 +149,6 @@ topo.position.y = 0.12;
 topo.receiveShadow = true;
 scene.add(topo);
 
-// --- ESFERAS ---
 const ROWS=10, COLS=10, SPACING=0.38, ORIGIN_X = -1.7, ORIGIN_Z = -1.7;
 let esferas = [], naArea = new Set(), contadas = new Set(), grupoVisuals = [];
 let labelsContagem = new Map();
@@ -172,7 +168,6 @@ for(let r=0; r<ROWS; r++) {
     }
 }
 
-// --- LÓGICA DE GRUPOS (APENAS LETRA G) ---
 function criarMolduraGrupo(indices) {
     const mainGroup = new THREE.Group();
     const mat = new THREE.LineBasicMaterial({ color: 0xffd166 });
@@ -202,12 +197,11 @@ function criarMolduraGrupo(indices) {
         mainGroup.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pontos), mat));
     });
 
-    // Centraliza apenas a letra "G"
     const avgR = (Math.min(...rIdx) + Math.max(...rIdx)) / 2;
     const avgC = (Math.min(...cIdx) + Math.max(...cIdx)) / 2;
     const div = document.createElement('div');
     div.className = 'num-label';
-    div.textContent = `G`; // Alterado: Apenas G, sem número
+    div.textContent = `G`; 
     const label = new CSS2DObject(div);
     label.position.set(ORIGIN_X + avgC * SPACING, 0.8, ORIGIN_Z + avgR * SPACING);
     mainGroup.add(label);

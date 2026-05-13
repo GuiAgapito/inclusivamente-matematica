@@ -20,7 +20,6 @@
         background-color: #d4d8e8;
       }
 
-      /* PAINEL DE CONTROLE */
       .controls {
         position: absolute;
         bottom: 20px;
@@ -204,7 +203,6 @@
       import * as THREE from "three";
       import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-      // --- CONFIGURAÇÕES GLOBAIS ---
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0x0a0a2a);
       scene.fog = new THREE.FogExp2(0x0a0a2a, 0.008);
@@ -233,7 +231,6 @@
       controls.target.set(0, 2, 0);
       controls.zoomSpeed = 1.0;
 
-      // --- ILUMINAÇÃO (MANTIDA IGUAL) ---
       const ambientLight = new THREE.AmbientLight(0x404060, 0.65);
       scene.add(ambientLight);
 
@@ -262,7 +259,6 @@
       backLight.position.set(0, 2, -6);
       scene.add(backLight);
 
-      // --- CHÃO E GRADE ---
       const chao = new THREE.Mesh(
         new THREE.PlaneGeometry(14, 12),
         new THREE.MeshStandardMaterial({
@@ -280,7 +276,6 @@
       gridHelper.position.y = -0.15;
       scene.add(gridHelper);
 
-      // --- PARÂMETROS DE CONSTRUÇÃO ---
       const CUBE_SIZE = 0.45;
 
       const COR_UNIDADE = 0xffd700;
@@ -307,8 +302,6 @@
       });
 
       const meshMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
-
-      // FUNÇÕES DE CRIAÇÃO DAS PEÇAS
 
       function criarUnidade(x, z, yBase = 0.2) {
         const group = new THREE.Group();
@@ -397,7 +390,6 @@
         return group;
       }
 
-      // GERENCIAMENTO DE VISUALIZAÇÃO
       let grupoUnidades = new THREE.Group();
       let grupoDezenas = new THREE.Group();
       let grupoCentenas = new THREE.Group();
@@ -405,19 +397,16 @@
 
       scene.add(grupoUnidades, grupoDezenas, grupoCentenas, grupoMilhares);
 
-      let modoAtual = "todos"; // 'unidade', 'dezena', 'centena', 'milhar', 'todos'
+      let modoAtual = "todos"; 
 
-      // Posições centralizadas para cada peça quando única
       const posicaoCentral = { x: 0, z: 0 };
 
-      // Posições para o modo "todos juntos"
       const posUnidade = { x: -3.5, z: -1.5 };
       const posDezena = { x: 0, z: -1.5 };
       const posCentena = { x: 3.5, z: -1.5 };
       const posMilhar = { x: 0, z: 2.5 };
 
       function atualizarVisualizacao() {
-        // Limpar grupos
         while (grupoUnidades.children.length)
           grupoUnidades.remove(grupoUnidades.children[0]);
         while (grupoDezenas.children.length)
@@ -458,7 +447,6 @@
           statusDiv.style.color = "#CE93D8";
           controls.target.set(0, 2.5, 0);
         } else {
-          // 'todos'
           grupoUnidades.add(criarUnidade(posUnidade.x, posUnidade.z, 0.25));
           grupoDezenas.add(criarDezena(posDezena.x, posDezena.z, 0.25));
           grupoCentenas.add(criarCentena(posCentena.x, posCentena.z, 0.25));
@@ -469,7 +457,6 @@
         }
       }
 
-      // TEMA CLARO/ESCURO
       let temaAtual = "dark";
       function alternarTema() {
         const body = document.body;
@@ -492,7 +479,6 @@
         }
       }
 
-      // EVENTOS DOS BOTÕES
       document.getElementById("btnUnidade").onclick = () => {
         modoAtual = "unidade";
         atualizarVisualizacao();
@@ -515,7 +501,6 @@
       };
       document.getElementById("btnTema").onclick = alternarTema;
 
-      // ANIMAÇÃO
       function animate() {
         requestAnimationFrame(animate);
         controls.update();
@@ -529,7 +514,6 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
 
-      // Inicializar
       atualizarVisualizacao();
       console.log("🚀 Material Dourado - Visualizador 3D carregado!");
       console.log(

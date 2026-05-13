@@ -8,26 +8,20 @@
 <link rel="shortcut icon" href="assets/matematica.png" type="image/x-icon">
 <style>
   :root {
-    /* 🔵 PALETA PRINCIPAL - CONSCIENTIZAÇÃO DO AUTISMO */
-    --accent: #1E88E5;       /* Azul Vivo Principal */
+    --accent: #1E88E5;    
     --accent-hover: #1565C0; 
-    --accent2: #FFCA28;      /* Amarelo Ouro (do quebra-cabeça) */
-    
-    /* 🎨 CORES DE APOIO (Neurodiversidade) */
-    --teal: #26A69A;         /* Verde */
+    --accent2: #FFCA28;   
+    --teal: #26A69A;      
     --teal-light: #E0F2F1;
-    --purple: #7E57C2;       /* Roxo */
+    --purple: #7E57C2;    
     --purple-light: #EDE7F6;
-    --red: #EF5350;          /* Vermelho */
+    --red: #EF5350;       
     --red-light: #FDECEA;
-
-    /* ⚪ FUNDOS E TEXTOS */
-    --bg: #F0F4F8;           /* Fundo levemente azulado/acinzentado */
+    --bg: #F0F4F8;      
     --bg2: #E1E8F0;
     --ink: #1C1A17;
     --ink2: #455A64;
-    --ink3: #90A4AE;
-    
+    --ink3: #90A4AE;  
     --border: rgba(30, 136, 229, 0.12);
     --border-strong: rgba(30, 136, 229, 0.22);
     --radius: 20px;
@@ -337,7 +331,6 @@
     max-width: 680px;
   }
 
-  /* ── ABOUT ── */
   .about-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -472,7 +465,6 @@
     margin-top: 2px;
   }
 
-  /* ── PSICOPEDAGOGA ── */
   .expert-section {
     background: var(--bg2);
   }
@@ -572,7 +564,6 @@
     font-weight: 300;
   }
 
-  /* ── MÓDULOS 3D ── */
   .modules-bg {
     background: var(--ink);
   }
@@ -608,7 +599,6 @@
     gap: 2rem;
   }
 
-  /* main block */
   .module-block {
     border-radius: 20px;
     overflow: hidden;
@@ -711,7 +701,6 @@
     letter-spacing: 0.04em;
   }
 
-  /* block 1: contagem - teal */
   .block-contagem { background: rgba(29,158,117,0.12); }
   .block-contagem .module-header { background: rgba(29,158,117,0.2); }
   .block-contagem .module-icon-wrap { background: var(--teal); }
@@ -723,7 +712,6 @@
   .sub-teal .submodule-num { color: #9FE1CB; }
   .sub-teal .submodule-title { color: #E1F5EE; }
 
-  /* block 2: operações - amber */
   .block-operacoes { background: rgba(186,117,23,0.12); }
   .block-operacoes .module-header { background: rgba(186,117,23,0.2); }
   .block-operacoes .module-icon-wrap { background: var(--amber); }
@@ -735,7 +723,6 @@
   .sub-amber .submodule-num { color: #FAC775; }
   .sub-amber .submodule-title { color: #FAEEDA; }
 
-  /* block 3: geometria - purple */
   .block-geometria { background: rgba(83,74,183,0.12); }
   .block-geometria .module-header { background: rgba(83,74,183,0.2); }
   .block-geometria .module-icon-wrap { background: var(--purple); }
@@ -747,7 +734,6 @@
   .sub-purple .submodule-num { color: #AFA9EC; }
   .sub-purple .submodule-title { color: #EEEDFE; }
 
-  /* ── EQUIPE ── */
   .team-section { background: var(--bg2); }
   .team-inner {
     max-width: 1100px;
@@ -797,7 +783,6 @@
     line-height: 1.4;
   }
 
-  /* ── TECH STACK ── */
   .tech-section {
     padding: 5rem 5%;
     max-width: 1100px;
@@ -926,7 +911,6 @@
     color: rgba(255,255,255,0.35);
   }
 
-  /* ── SEPARATOR ── */
   .separator {
     height: 1px;
     background: var(--border);
@@ -934,7 +918,6 @@
     margin: 0 auto;
   }
 
-  /* ── RESPONSIVE ── */
   @media (max-width: 768px) {
     .about-grid { grid-template-columns: 1fr; gap: 3rem; }
     .about-visual { display: none; }
@@ -946,8 +929,7 @@
     .block-geometria .submodules-grid { grid-template-columns: 1fr; }
     .nav-links { display: none; }
   }
-
-  /* ── ANIMATIONS ── */
+  
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(24px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -994,7 +976,6 @@
 
   <div class="hero-content">
     <div class="hero-tag">Computação Gráfica · UFC Sobral · 2026.1</div>
-    <!-- <h1>Matemática que<br><em>todo mundo</em><br>consegue ver.</h1> -->
      <h1>Transformando <em>matemática</em> em <br><em>experiência</em></h1>
     <p class="hero-sub">
       Um ambiente 3D interativo para o ensino de matemática básica desenvolvido especialmente para alunos neurodivergentes — aprender pelo olhar, tocar e explorar.
@@ -1017,9 +998,6 @@
   </div>
 </header>
 
-<!-- ══════════════════════════════════════════════
-     SOBRE O PROJETO
-══════════════════════════════════════════════ -->
 <section id="sobre" class="section">
   <div class="about-grid">
     <div>
@@ -1087,19 +1065,14 @@
 
 <div class="separator"></div>
 
-<!-- ══════════════════════════════════════════════
-     ESPECIALISTA / PSICOPEDAGOGA
-══════════════════════════════════════════════ -->
 <section id="especialista" class="expert-section">
   <div class="expert-inner">
-    <!-- FOTO -->
     <div class="expert-photo-wrap">
       <a href="https://www.instagram.com/valentinasanxo_terap?igsh=MW16OHo2dmp2aDU0bA==" target="_blank" class="expert-photo">
         <div class="photo-real" style="position: relative; border-radius: 20px; overflow: hidden;">
           <img src="assets/IMG_3609.jpeg" 
                alt="Valentina" 
                style="width: 100%; display: block; aspect-ratio: 3/4; object-fit: cover;">
-          <!-- OVERLAY (nome sobre a imagem) -->
           <div class="photo-overlay" style="position: absolute; bottom: 0; left: 0; width: 100%; padding: 30px 15px 15px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); color: white; text-align: left; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
             <div class="photo-name" style="font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 4px;">Valentina Sanxo</div>
             <div class="photo-role" style="font-size: 0.75rem; opacity: 0.9;">Psicopedagoga · Consultora do Projeto</div>
@@ -1109,7 +1082,6 @@
       <div class="expert-badge-float">Especialista convidada</div>
     </div>
 
-    <!-- TEXTO AO LADO -->
     <div>
       <p class="section-label">Perspectiva especializada</p>
       <h2 class="section-title">Por que isso importa no ensino inclusivo?</h2>
@@ -1128,7 +1100,6 @@
         A experiência imersiva e a possibilidade de interação direta com os objetos virtuais ativa múltiplas áreas cognitivas simultaneamente, favorecendo a consolidação do aprendizado e a autoconfiança dos estudantes.
       </p>
 
-      <!-- 🔢 INDICADORES ESTATÍSTICOS -->
       <div style="display:flex; gap:2rem; margin-top:2rem; flex-wrap:wrap;">
         <div>
           <div style="font-family:'Syne',sans-serif; font-size:28px; font-weight:800; color:var(--accent);">23%</div>
@@ -1147,9 +1118,6 @@
   </div>
 </section>
 
-<!-- ══════════════════════════════════════════════
-     MÓDULOS 3D
-══════════════════════════════════════════════ -->
 <section id="modulos" class="modules-bg">
   <div class="modules-inner">
     <div class="modules-header">
@@ -1160,7 +1128,6 @@
 
     <div class="modules-grid">
 
-      <!-- ── BLOCO 1: CONTAGEM ── -->
       <div class="module-block block-contagem">
         <div class="module-header">
           <div class="module-icon-wrap">🧮</div>
@@ -1207,7 +1174,6 @@
         </div>
       </div>
 
-      <!-- ── BLOCO 2: OPERAÇÕES ── -->
       <div class="module-block block-operacoes">
         <div class="module-header">
           <div class="module-icon-wrap">➕</div>
@@ -1253,7 +1219,6 @@
         </div>
       </div>
 
-      <!-- ── BLOCO 3: GEOMETRIA ── -->
       <div class="module-block block-geometria">
         <div class="module-header">
           <div class="module-icon-wrap">🔷</div>
@@ -1287,9 +1252,6 @@
   </div>
 </section>
 
-<!-- ══════════════════════════════════════════════
-     TECNOLOGIAS
-══════════════════════════════════════════════ -->
 <section class="tech-section">
   <p class="section-label">Stack técnico</p>
   <h2 class="section-title">Construído com tecnologias modernas</h2>
@@ -1329,9 +1291,6 @@
 
 <div class="separator"></div>
 
-<!-- ══════════════════════════════════════════════
-     EQUIPE
-══════════════════════════════════════════════ -->
 <section id="equipe" class="team-section">
   <div class="team-inner">
     <p class="section-label">A equipe</p>
@@ -1378,9 +1337,6 @@
   </div>
 </section>
 
-<!-- ══════════════════════════════════════════════
-     FOOTER
-══════════════════════════════════════════════ -->
 <footer>
   <div class="footer-inner">
     <div class="footer-top">
