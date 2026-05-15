@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>InclusivaMente Matemática - Geometria 3D + Formas Planas</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="../../assets/matematica.png" type="image/x-icon">
   <style>
     * {
       margin: 0;
@@ -29,7 +30,6 @@
     canvas {
       display: block;
     }
-    /* Painel lateral */
     #ui {
       position: fixed;
       top: 0;
@@ -128,29 +128,6 @@
       accent-color: var(--accent);
       cursor: pointer;
     }
-    #plan-btn {
-      width: 100%;
-      padding: 12px;
-      margin-top: 4px;
-      border: 1px solid rgba(76, 201, 240, .4);
-      border-radius: 12px;
-      background: rgba(76, 201, 240, .1);
-      color: var(--accent);
-      font-family: 'Nunito', sans-serif;
-      font-weight: 900;
-      font-size: 13px;
-      cursor: pointer;
-      transition: .18s;
-    }
-    #plan-btn:hover:not(:disabled) {
-      background: rgba(76, 201, 240, .22);
-      transform: translateY(-2px);
-    }
-    #plan-btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      transform: none;
-    }
     #info-bar {
       position: fixed;
       bottom: 0;
@@ -234,9 +211,6 @@
     <button class="shape-btn" data-shape="triangle" onclick="selectShape('triangle',this)"><div class="icon" style="background:rgba(80,210,120,.2)">🔺</div> Triângulo equilátero</button>
     <button class="shape-btn" data-shape="hexagon" onclick="selectShape('hexagon',this)"><div class="icon" style="background:rgba(240,180,60,.2)">⬡</div> Hexágono regular</button>
 
-    <div class="section-label">🎛️ Visualização</div>
-    <button id="plan-btn" onclick="togglePlanification()">📐 Ver Planificação</button>
-
     <div class="section-label">👁️ Elementos visíveis</div>
     <label class="toggle-row"><input type="checkbox" id="chk-faces" checked onchange="toggleLayer('faces',this.checked)"> Faces / Preenchimento</label>
     <label class="toggle-row"><input type="checkbox" id="chk-edges" checked onchange="toggleLayer('edges',this.checked)"> Arestas / Contorno</label>
@@ -300,13 +274,12 @@
     gridHelper.position.y = 0.008;
     scene.add(gridHelper);
     
-    let currentGroup = null;      
-    let meshesList = [];          
-    let edgesList = [];           
-    let vertsList = [];           
-    let isPlanified = false;
+    let currentGroup = null;
+    let meshesList = [];
+    let edgesList = [];
+    let vertsList = [];
     let currentShapeId = 'cube';
-    let currentShapeType = 'solid'; 
+    let currentShapeType = 'solid';
     
     const SHAPES_INFO = {
       cube: { name:'Cubo', props:'6 faces · 12 arestas · 8 vértices', desc:'Poliedro regular – faces quadradas', color:0x4cc9f0, type:'solid' },
@@ -333,9 +306,9 @@
         side: THREE.DoubleSide
       });
     }
-        
+    
     function addEdgesFromPoints(points, yOffset, color=0xffffff) {
-      const linePoints = points.concat([points[0]]); 
+      const linePoints = points.concat([points[0]]);
       const positions = [];
       for (let i = 0; i < linePoints.length-1; i++) {
         const p1 = linePoints[i];
@@ -362,7 +335,6 @@
       });
     }
     
-  
     function createSquare() {
       const side = 3.2;
       const yBase = 0;
@@ -435,11 +407,10 @@
     function createTriangle() {
       const side = 3.5;
       const heightEq = side * Math.sqrt(3) / 2;
-      const centerY = -heightEq/3;
       const points = [
-        new THREE.Vector3(0, 0, heightEq * 0.66),               
-        new THREE.Vector3(-side/2, 0, -heightEq * 0.33),        
-        new THREE.Vector3( side/2, 0, -heightEq * 0.33)         
+        new THREE.Vector3(0, 0, heightEq * 0.66),
+        new THREE.Vector3(-side/2, 0, -heightEq * 0.33),
+        new THREE.Vector3( side/2, 0, -heightEq * 0.33)
       ];
       const positions = [];
       points.forEach(p => { positions.push(p.x, p.y+0.02, p.z); });
@@ -488,6 +459,7 @@
       edgesList.push(lines);
       currentGroup.add(lines);
     }
+    
     function addVerticesFromGeometry(geometry, yOffset=0) {
       const posAttr = geometry.attributes.position;
       const seen = new Set();
@@ -502,6 +474,7 @@
         currentGroup.add(dot);
       }
     }
+    
     function addMeshSolid(geometry, color, yOffset=0) {
       const mat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.3, metalness: 0.1, transparent: true, opacity: 0.88 });
       const mesh = new THREE.Mesh(geometry, mat);
@@ -527,15 +500,6 @@
     }
     function createCuboidSolid() { const g=new THREE.BoxGeometry(4,2,3); addMeshSolid(g,0xff6496,1); addEdgesFromGeometry(g,1); addVerticesFromGeometry(g,1); }
     
-    function planCube(){ createCubeSolid(); isPlanified=false; }
-    function planSphere(){ createSphereSolid(); isPlanified=false; }
-    function planCone(){ createConeSolid(); isPlanified=false; }
-    function planCylinder(){ createCylinderSolid(); isPlanified=false; }
-    function planPyramid(){ createPyramidSolid(); isPlanified=false; }
-    function planTriPyramid(){ createTriPyramidSolid(); isPlanified=false; }
-    function planCuboid(){ createCuboidSolid(); isPlanified=false; }
-    
-
     function clearScene() {
       if (currentGroup) scene.remove(currentGroup);
       currentGroup = null;
@@ -548,19 +512,9 @@
       clearScene();
       currentGroup = new THREE.Group();
       scene.add(currentGroup);
-      isPlanified = false;
       currentShapeId = shapeId;
       const info = SHAPES_INFO[shapeId];
       currentShapeType = info.type;
-          
-      const planBtn = document.getElementById('plan-btn');
-      if (info.type === 'plane') {
-        planBtn.disabled = true;
-        planBtn.textContent = '📐 Sem planificação (2D)';
-      } else {
-        planBtn.disabled = false;
-        planBtn.textContent = '📐 Ver Planificação';
-      }
       
       switch(shapeId) {
         case 'cube': createCubeSolid(); break;
@@ -583,17 +537,6 @@
       document.getElementById('mode-badge').textContent = (info.type === 'plane') ? 'FIGURA PLANA 2D' : 'SÓLIDO 3D';
     }
     
-    function togglePlanification() {
-      if (currentShapeType === 'plane') return;
-      if (!isPlanified) {        
-        buildShape(currentShapeId);
-        isPlanified = false;
-      } else {
-        buildShape(currentShapeId);
-        isPlanified = false;
-      }
-    }
-    
     function updateInfoBar(shapeId) {
       const d = SHAPES_INFO[shapeId];
       document.getElementById('shape-name').innerHTML = d.name;
@@ -609,6 +552,7 @@
       edgesList.forEach(l => l.visible = e);
       vertsList.forEach(dot => dot.visible = v);
     }
+    
     window.toggleLayer = (layer, val) => {
       if (layer === 'faces') meshesList.forEach(m => m.visible = val);
       if (layer === 'edges') edgesList.forEach(l => l.visible = val);
@@ -635,15 +579,13 @@
     function animate() {
       requestAnimationFrame(animate);
       controls.update();
-      if (currentGroup && !isPlanified && currentShapeType !== 'plane') {
-        currentGroup.rotation.y += 0.0022;
-      } else if (currentGroup && currentShapeType === 'plane') {    
+      if (currentGroup) {
         currentGroup.rotation.y += 0.0022;
       }
       renderer.render(scene, camera);
     }
     animate();
-        
+    
     buildShape('cube');
   </script>
 </body>

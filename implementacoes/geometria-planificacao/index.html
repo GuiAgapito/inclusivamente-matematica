@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Geometria 3D – InclusivaMente Matemática</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="../../assets/matematica.png" type="image/x-icon">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #0d1b2a;
+      --panel: rgba(8, 18, 32, .92);
+      --border: rgba(168, 218, 220, .18);
+      --text: #e8f4f8;
+      --muted: rgba(232, 244, 248, .5);
+      --accent: #4cc9f0;
+    }
+
+    body {
+      overflow: hidden;
+      background: var(--bg);
+      font-family: 'Nunito', sans-serif;
+      color: var(--text);
+    }
+
+    canvas {
+      display: block;
+    }
+
+    /* ── PAINEL LATERAL ── */
+    #ui {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 270px;
+      height: 100vh;
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      backdrop-filter: blur(24px);
+      display: flex;
+      flex-direction: column;
+      z-index: 20;
+      overflow-y: auto;
+      padding: 20px 16px 20px;
+    }
+
+    #ui h1 {
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: .5px;
+      color: var(--accent);
+      margin-bottom: 4px;
+      line-height: 1.2;
+    }
+
+    #ui .subtitle {
+      font-size: 10px;
+      color: var(--muted);
+      margin-bottom: 18px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .section-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--muted);
+      font-weight: 900;
+      margin-bottom: 10px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .shape-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 10px 14px;
+      margin-bottom: 6px;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, .05);
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      transition: .18s;
+      text-align: left;
+    }
+
+    .shape-btn:hover {
+      background: rgba(76, 201, 240, .12);
+      border-color: rgba(76, 201, 240, .35);
+      transform: translateX(3px);
+    }
+
+    .shape-btn.active {
+      background: rgba(76, 201, 240, .2);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .toggle-row input[type=checkbox] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    #plan-btn {
+      width: 100%;
+      padding: 12px;
+      margin-top: 4px;
+      border: 1px solid rgba(76, 201, 240, .4);
+      border-radius: 12px;
+      background: rgba(76, 201, 240, .1);
+      color: var(--accent);
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: 13px;
+      cursor: pointer;
+      transition: .18s;
+      letter-spacing: .5px;
+    }
+
+    #plan-btn:hover {
+      background: rgba(76, 201, 240, .22);
+      transform: translateY(-2px);
+    }
+
+    /* ── BARRA INFERIOR DE INFO ── */
+    #info-bar {
+      position: fixed;
+      bottom: 0;
+      left: 270px;
+      right: 0;
+      padding: 14px 30px;
+      background: var(--panel);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 20;
+    }
+
+    #shape-name {
+      font-size: 22px;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    #shape-props {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    #shape-desc {
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 800;
+      margin-top: 2px;
+      max-width: 480px;
+    }
+
+    #mode-badge {
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      background: rgba(76, 201, 240, .15);
+      border: 1px solid rgba(76, 201, 240, .4);
+      color: var(--accent);
+    }
+
+    #hint {
+      position: fixed;
+      bottom: 80px;
+      right: 18px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.9;
+      text-align: right;
+      z-index: 10;
+      font-weight: 700;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="c"></canvas>
+
+  <!-- PAINEL -->
+  <div id="ui">
+    <h1>🔷 Geometria 3D</h1>
+    <div class="subtitle">InclusivaMente Matemática</div>
+
+    <div class="section-label">Formas Geométricas</div>
+
+    <button class="shape-btn active" data-shape="cube" onclick="select('cube',this)">
+      <div class="icon" style="background:rgba(76,201,240,.2)">🟦</div> Cubo
+    </button>
+    <button class="shape-btn" data-shape="sphere" onclick="select('sphere',this)">
+      <div class="icon" style="background:rgba(255,183,3,.2)">🟡</div> Esfera
+    </button>
+    <button class="shape-btn" data-shape="cone" onclick="select('cone',this)">
+      <div class="icon" style="background:rgba(251,133,0,.2)">🔶</div> Cone
+    </button>
+    <button class="shape-btn" data-shape="cylinder" onclick="select('cylinder',this)">
+      <div class="icon" style="background:rgba(82,183,136,.2)">🟢</div> Cilindro
+    </button>
+    <button class="shape-btn" data-shape="pyramid" onclick="select('pyramid',this)">
+      <div class="icon" style="background:rgba(214,40,40,.2)">🔺</div> Pirâmide (quadrada)
+    </button>
+    <button class="shape-btn" data-shape="triPyramid" onclick="select('triPyramid',this)">
+      <div class="icon" style="background:rgba(158,100,240,.2)">🔻</div> Pirâmide (triangular)
+    </button>
+    <button class="shape-btn" data-shape="cuboid" onclick="select('cuboid',this)">
+      <div class="icon" style="background:rgba(255,100,150,.2)">📦</div> Paralelepípedo
+    </button>
+
+    <div class="section-label">Modo de Visualização</div>
+
+    <button id="plan-btn" onclick="togglePlanification()">📐 Ver Planificação</button>
+
+    <div class="section-label" style="margin-top:12px;">Elementos Visíveis</div>
+
+    <label class="toggle-row">
+      <input type="checkbox" id="chk-faces" checked onchange="toggleLayer('faces',this.checked)">
+      Faces
+    </label>
+    <label class="toggle-row">
+      <input type="checkbox" id="chk-edges" checked onchange="toggleLayer('edges',this.checked)">
+      Arestas
+    </label>
+    <label class="toggle-row">
+      <input type="checkbox" id="chk-verts" checked onchange="toggleLayer('verts',this.checked)">
+      Vértices
+    </label>
+  </div>
+
+  <!-- INFO BAR -->
+  <div id="info-bar">
+    <div>
+      <div id="shape-name">Cubo</div>
+      <div id="shape-props">6 faces · 12 arestas · 8 vértices</div>
+      <div id="shape-desc">Poliedro regular — todas as faces são quadrados congruentes</div>
+    </div>
+    <div id="mode-badge">MODO 3D</div>
+  </div>
+
+  <div id="hint">
+    🖱️ Arraste para girar<br>
+    🔍 Scroll para zoom<br>
+    📐 Clique "Planificação"
+  </div>
+
+  <!-- THREE.JS CDN (r128 compatível) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <script>
+    /* ═══════════════════════════════════════
+       RENDERER Começar essa brincadeira
+    ═══════════════════════════════════════ */
+    const canvas = document.getElementById('c');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    /* ═══════════════════════════════════════
+       SCENE
+    ═══════════════════════════════════════ */
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0d1b2a);
+    scene.fog = new THREE.FogExp2(0x0d1b2a, 0.018);
+
+    /* ═══════════════════════════════════════
+       CAMERA
+    ═══════════════════════════════════════ */
+    const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 200);
+    camera.position.set(0, 6, 13);
+
+    /* ═══════════════════════════════════════
+       CONTROLS
+    ═══════════════════════════════════════ */
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.07;
+    controls.minDistance = 4;
+    controls.maxDistance = 26;
+    controls.target.set(0, 1.5, 0);
+    controls.maxPolarAngle = Math.PI * 0.85;
+
+    /* ═══════════════════════════════════════
+       LIGHTS
+    ═══════════════════════════════════════ */
+    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+
+    const sun = new THREE.DirectionalLight(0xffffff, 1.6);
+    sun.position.set(8, 14, 10);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.near = 0.5;
+    sun.shadow.camera.far = 60;
+    sun.shadow.camera.left = -15;
+    sun.shadow.camera.right = 15;
+    sun.shadow.camera.top = 15;
+    sun.shadow.camera.bottom = -15;
+    scene.add(sun);
+
+    const fill = new THREE.PointLight(0x4cc9f0, 0.8, 40);
+    fill.position.set(-8, 8, 6);
+    scene.add(fill);
+
+    const back = new THREE.PointLight(0xffb703, 0.4, 30);
+    back.position.set(6, 4, -8);
+    scene.add(back);
+
+    /* ═══════════════════════════════════════
+       FLOOR acho que da certo assim
+    ═══════════════════════════════════════ */
+    // Textura procedural xadrez
+    const ts = 128;
+    const tData = new Uint8Array(ts * ts * 4);
+    for (let i = 0; i < ts; i++) for (let j = 0; j < ts; j++) {
+      const idx = (i * ts + j) * 4;
+      const c = ((i >> 4) + (j >> 4)) % 2 ? 38 : 28;
+      tData[idx] = c; tData[idx + 1] = c + 4; tData[idx + 2] = c + 10; tData[idx + 3] = 255;
+    }
+    const floorTex = new THREE.DataTexture(tData, ts, ts, THREE.RGBAFormat);
+    floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
+    floorTex.repeat.set(8, 8);
+    floorTex.needsUpdate = true;
+
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(60, 60),
+      new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.9, metalness: 0.05 })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.receiveShadow = true;
+    scene.add(floor);
+
+    const grid = new THREE.GridHelper(60, 60, 0x2a4a6a, 0x1e3550);
+    grid.position.y = 0.005;
+    scene.add(grid);
+
+    /* ═══════════════════════════════════════
+       TEXTURA PROCEDURAL POR COR
+    ═══════════════════════════════════════ */
+    function makeTexture(hexColor) {
+      const size = 64;
+      const data = new Uint8Array(size * size * 4);
+      const r0 = (hexColor >> 16) & 0xff, g0 = (hexColor >> 8) & 0xff, b0 = hexColor & 0xff;
+      for (let i = 0; i < size; i++) for (let j = 0; j < size; j++) {
+        const idx = (i * size + j) * 4;
+        const noise = (Math.random() - 0.5) * 18;
+        data[idx] = Math.min(255, Math.max(0, r0 + noise));
+        data[idx + 1] = Math.min(255, Math.max(0, g0 + noise));
+        data[idx + 2] = Math.min(255, Math.max(0, b0 + noise));
+        data[idx + 3] = 255;
+      }
+      const tex = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
+      tex.needsUpdate = true;
+      return tex;
+    }
+
+    /* ═══════════════════════════════════════
+       ESTADO GLOBAL
+    ═══════════════════════════════════════ */
+    let group = null;
+    let meshes = [];       // faces
+    let edgeLines = [];    // arestas
+    let vertDots = [];     // vértices
+    let isPlanified = false;
+    let isAnimating = false;
+    let currentShape = 'cube';
+
+    const SHAPES = {
+      cube: {
+        name: 'Cubo',
+        props: '6 faces · 12 arestas · 8 vértices',
+        desc: 'Poliedro regular — todas as faces são quadrados congruentes',
+        color: 0x4cc9f0
+      },
+      sphere: {
+        name: 'Esfera',
+        props: 'Superfície curva · ∞ pontos',
+        desc: 'Lugar geométrico de todos os pontos equidistantes do centro (raio)',
+        color: 0xffb703
+      },
+      cone: {
+        name: 'Cone',
+        props: '2 faces · 1 aresta circular · 1 vértice (ápice)',
+        desc: 'Sólido com base circular e superfície lateral que converge no ápice',
+        color: 0xfb8500
+      },
+      cylinder: {
+        name: 'Cilindro',
+        props: '3 faces · 2 arestas circulares · 0 vértices',
+        desc: 'Sólido gerado pela rotação de um retângulo em torno de seu eixo',
+        color: 0x52b788
+      },
+      pyramid: {
+        name: 'Pirâmide de Base Quadrada',
+        props: '5 faces · 8 arestas · 5 vértices',
+        desc: 'Base quadrada + 4 faces triangulares convergindo no ápice',
+        color: 0xd62828
+      },
+      triPyramid: {
+        name: 'Pirâmide de Base Triangular (Tetraedro)',
+        props: '4 faces · 6 arestas · 4 vértices',
+        desc: 'O sólido platônico mais simples — 4 triângulos equiláteros',
+        color: 0x9e64f0
+      },
+      cuboid: {
+        name: 'Paralelepípedo (Bloco Retangular)',
+        props: '6 faces · 12 arestas · 8 vértices',
+        desc: 'Poliedro com 6 faces retangulares — generalização do cubo',
+        color: 0xff6496
+      }
+    };
+
+    /* ═══════════════════════════════════════
+       MATERIAL HELPER deve ajudar
+    ═══════════════════════════════════════ */
+    function makeMat(color, opacity = 0.88, side = THREE.FrontSide) {
+      return new THREE.MeshStandardMaterial({
+        map: makeTexture(color),
+        color: 0xffffff,
+        transparent: opacity < 1,
+        opacity,
+        roughness: 0.38,
+        metalness: 0.1,
+        side
+      });
+    }
+
+    /* ═══════════════════════════════════════
+       LIMPAR CENA
+    ═══════════════════════════════════════ */
+    function clearScene() {
+      if (group) { scene.remove(group); }
+      group = null; meshes = []; edgeLines = []; vertDots = [];
+    }
+
+    /* ═══════════════════════════════════════
+       ADICIONAR VÉRTICES VISUAIS
+    ═══════════════════════════════════════ */
+    function addVertices(geometry, yOffset = 0) {
+      const pos = geometry.attributes.position;
+      const seen = new Set();
+      for (let i = 0; i < pos.count; i++) {
+        const x = +pos.getX(i).toFixed(3);
+        const y = +pos.getY(i).toFixed(3);
+        const z = +pos.getZ(i).toFixed(3);
+        const k = `${x}|${y}|${z}`;
+        if (seen.has(k)) continue;
+        seen.add(k);
+        const dot = new THREE.Mesh(
+          new THREE.SphereGeometry(0.09, 16, 16),
+          new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x88ddff, emissiveIntensity: 1.4 })
+        );
+        dot.position.set(x, y + yOffset, z);
+        vertDots.push(dot);
+        group.add(dot);
+      }
+    }
+
+    /* ═══════════════════════════════════════
+       ADICIONAR ARESTAS
+    ═══════════════════════════════════════ */
+    function addEdges(geometry, yOffset = 0) {
+      const eg = new THREE.EdgesGeometry(geometry);
+      const line = new THREE.LineSegments(
+        eg,
+        new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 1 })
+      );
+      line.position.y = yOffset;
+      edgeLines.push(line);
+      group.add(line);
+    }
+
+    /* ═══════════════════════════════════════
+       ADICIONAR MESH PRINCIPAL
+    ═══════════════════════════════════════ */
+    function addMesh(geometry, color, yOffset = 0) {
+      const m = new THREE.Mesh(geometry, makeMat(color));
+      m.position.y = yOffset;
+      m.castShadow = true;
+      m.receiveShadow = true;
+      meshes.push(m);
+      group.add(m);
+      return m;
+    }
+
+    /* ═══════════════════════════════════════
+       ANIMAÇÃO DE ENTRADA
+    ═══════════════════════════════════════ */
+    function animateIn() {
+      group.scale.set(0, 0, 0);
+      gsap.to(group.scale, { x: 1, y: 1, z: 1, duration: .65, ease: 'back.out(1.7)' });
+    }
+
+    // É agora que o negócio toma forma
+    /* ═══════════════════════════════════════
+       CRIAR CUBO 3D
+    ═══════════════════════════════════════ */
+    function createCube3D() {
+      const geo = new THREE.BoxGeometry(3, 3, 3);
+      const half = 1.5;
+      addMesh(geo, 0x4cc9f0, half);
+      addEdges(geo, half);
+      addVertices(geo, half);
+    }
+
+    /* ═══════════════════════════════════════
+       CRIAR ESFERA 3D
+    ═══════════════════════════════════════ */
+    function createSphere3D() {
+      const geo = new THREE.SphereGeometry(2, 36, 36);
+      addMesh(geo, 0xffb703, 2);
+      // meridians + parallels como "arestas visuais"
+      const wf = new THREE.Mesh(
+        new THREE.SphereGeometry(2.01, 18, 18),
+        new THREE.MeshBasicMaterial({ color: 0xfff3b0, wireframe: true, opacity: 0.18, transparent: true })
+      );
+      wf.position.y = 2;
+      edgeLines.push(wf);
+      group.add(wf);
+    }
+
+    /* ═══════════════════════════════════════
+       CRIAR CONE 3D
+    ═══════════════════════════════════════ */
+    function createCone3D() {
+      const geo = new THREE.ConeGeometry(2, 4, 32);
+      addMesh(geo, 0xfb8500, 2);
+      addEdges(geo, 2);
+      // vértice ápice
+      const apex = new THREE.Mesh(
+        new THREE.SphereGeometry(0.12, 16, 16),
+        new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffcc88, emissiveIntensity: 1.5 })
+      );
+      apex.position.set(0, 4, 0);
+      vertDots.push(apex);
+      group.add(apex);
+    }
+
+    /* ═══════════════════════════════════════
+       CRIAR CILINDRO 3D
+    ═══════════════════════════════════════ */
+    function createCylinder3D() {
+      const geo = new THREE.CylinderGeometry(2, 2, 4, 32);
+      addMesh(geo, 0x52b788, 2);
+      addEdges(geo, 2);
+    }
+
+    /* ═══════════════════════════════════════
+       CRIAR PIRÂMIDE QUADRADA 3D
+    ═══════════════════════════════════════ */
+    function createPyramid3D() {
+      // Pirâmide base quadrada via ConeGeometry com 4 segmentos
+      const geo = new THREE.ConeGeometry(2.2, 4, 4);
+      addMesh(geo, 0xd62828, 2);
+      addEdges(geo, 2);
+      addVertices(geo, 2);
+    }
+
+    /* ═══════════════════════════════════════
+       CRIAR PIRÂMIDE TRIANGULAR (TETRAEDRO)
+    ═══════════════════════════════════════ */
+    function createTriPyramid3D() {
+      // Tetraedro com base no chão (y=0)
+      const lado = 3.2;
+      const altura = Math.sqrt(2 / 3) * lado; // ≈ 2.61
+
+      // Vértices: 3 da base no chão, 1 no topo
+      const verts = [
+        new THREE.Vector3(0, altura, 0),                     // ápice
+        new THREE.Vector3(lado / 2, 0, -lado * 0.288),        // vértice base A
+        new THREE.Vector3(-lado / 2, 0, -lado * 0.288),       // vértice base B
+        new THREE.Vector3(0, 0, lado * 0.577)               // vértice base C
+      ];
+
+      const positions = [];
+      const normals = [];
+
+      function addFace(a, b, c) {
+        const va = verts[a], vb = verts[b], vc = verts[c];
+        const n = new THREE.Vector3().crossVectors(
+          new THREE.Vector3().subVectors(vb, va),
+          new THREE.Vector3().subVectors(vc, va)
+        ).normalize();
+        for (const v of [va, vb, vc]) {
+          positions.push(v.x, v.y, v.z);
+          normals.push(n.x, n.y, n.z);
+        }
+      }
+
+      // 4 faces triangulares
+      addFace(0, 1, 2);  // face 1
+      addFace(0, 2, 3);  // face 2  
+      addFace(0, 3, 1);  // face 3
+      addFace(1, 3, 2);  // base (no chão)
+
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
+      geo.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(normals), 3));
+
+      addMesh(geo, 0x9e64f0, 0);
+      addEdges(geo, 0);
+
+      // Vértices visuais
+      verts.forEach(v => {
+        const dot = new THREE.Mesh(
+          new THREE.SphereGeometry(0.1, 16, 16),
+          new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xcc99ff, emissiveIntensity: 1.4 })
+        );
+        dot.position.copy(v);
+        vertDots.push(dot);
+        group.add(dot);
+      });
+    }
+    /* ═══════════════════════════════════════
+       CRIAR PARALELEPÍPEDO 3D
+    ═══════════════════════════════════════ */
+    function createCuboid3D() {
+      const geo = new THREE.BoxGeometry(4, 2, 3);
+      addMesh(geo, 0xff6496, 1);
+      addEdges(geo, 1);
+      addVertices(geo, 1);
+    }
+    // Bora planificar, era pra ser mais fácil...
+    /* ═══════════════════════════════════════
+       PLANIFICAÇÃO — CUBO
+       Cruz em T: top, front, bottom, left, right, back
+    ═══════════════════════════════════════ */
+    function planCube() {
+      const s = 3;
+      const mat = makeMat(0x4cc9f0, 0.9, THREE.DoubleSide);
+      const positions = [
+        [0, 0],   // centro (frente)
+        [0, -s],   // topo
+        [0, s],   // base
+        [-s, 0],   // esquerda
+        [s, 0],   // direita
+        [-2 * s, 0], // trás (ao lado da esquerda)
+      ];
+      positions.forEach(([x, z]) => {
+        const m = new THREE.Mesh(new THREE.PlaneGeometry(s - 0.05, s - 0.05), mat.clone());
+        m.rotation.x = -Math.PI / 2;
+        m.position.set(x, 0.02, z);
+        m.castShadow = false;
+        meshes.push(m);
+        group.add(m);
+        // borda
+        const eg = new THREE.EdgesGeometry(new THREE.PlaneGeometry(s, s));
+        const el = new THREE.LineSegments(eg, new THREE.LineBasicMaterial({ color: 0xffffff }));
+        el.rotation.x = -Math.PI / 2;
+        el.position.set(x, 0.03, z);
+        edgeLines.push(el);
+        group.add(el);
+      });
+    }
+    // como Planifica uma Esferaa aqui?
+    /* ═══════════════════════════════════════
+       PLANIFICAÇÃO — ESFERA
+       vai ser no retângulo msm
+    ═══════════════════════════════════════ */
+    function planSphere() {
+      const R = 2;
+      const strips = 18;
+      const totalW = 2 * Math.PI * R;  // 12.56…
+      const totalH = Math.PI * R;    // 6.28…
+      const sw = totalW / strips;
+      const mat = new THREE.MeshStandardMaterial({
+        color: 0xffb703,
+        map: makeTexture(0xffb703),
+        roughness: 0.4, metalness: 0.1,
+        side: THREE.DoubleSide,
+        transparent: true, opacity: 0.9
+      });
+
+      for (let i = 0; i < strips; i++) {
+        const t = i / (strips - 1);
+        const factor = Math.sin(t * Math.PI );
+        const stripHeight =totalH * (0.12 + factor);
+        const stripWidth =sw * 0.32;
+        const geo = new THREE.PlaneGeometry(
+            stripWidth,
+            stripHeight
+          );
+        const x =(i - strips / 2 + 0.5) * sw * 0.55;
+        const m =
+          new THREE.Mesh(
+            geo,
+            mat.clone()
+          );
+        m.rotation.x = -Math.PI / 2;
+        m.position.set(
+          x,
+          0.02,
+          0
+        );
+
+        meshes.push(m);
+        group.add(m);
+
+        const eg =  new THREE.EdgesGeometry( geo);
+
+        const el = new THREE.LineSegments( eg,new THREE.LineBasicMaterial({
+              color: 0xfff3b0
+            })
+
+          );
+
+        el.rotation.x = -Math.PI / 2;
+
+        el.position.set(
+          x,
+          0.04,
+          0
+        );
+
+        edgeLines.push(el);
+
+        group.add(el);
+
+      }
+      // Legenda
+      addPlanLabel('A esfera não tem planificação perfeita.\nEstes "fusos" representam a projeção cilíndrica (Mercator).', 0, 0.15, -5);
+    }
+
+    /* ═══════════════════════════════════════
+       PLANIFICAÇÃO — CONE
+    ═══════════════════════════════════════ */
+    function planCone() {
+      const R = 2, H = 4;
+      const slant = Math.sqrt(R * R + H * H); // geratriz
+      const angle = (2 * Math.PI * R) / slant; // ângulo do setor
+
+      const mat = makeMat(0xfb8500, 0.9, THREE.DoubleSide);
+
+      // Setor circular (lateral)
+      const shape = new THREE.Shape();
+      shape.moveTo(0, 0);
+      shape.absarc(0, 0, slant, -angle / 2, angle / 2, false);
+      shape.lineTo(0, 0);
+      const sectorGeo = new THREE.ShapeGeometry(shape, 48);
+      const sector = new THREE.Mesh(sectorGeo, mat.clone());
+      sector.rotation.x = -Math.PI / 2;
+      sector.position.set(0, 0.02, 0);
+      meshes.push(sector);
+      group.add(sector);
+
+      const seg = new THREE.EdgesGeometry(sectorGeo);
+      const sl = new THREE.LineSegments(seg, new THREE.LineBasicMaterial({ color: 0xffffff }));
+      sl.rotation.x = -Math.PI / 2; sl.position.set(0, 0.04, 0);
+      edgeLines.push(sl); group.add(sl);
+
+      // Base circular
+      const baseGeo = new THREE.CircleGeometry(R, 48);
+      const base = new THREE.Mesh(baseGeo, mat.clone());
+      base.rotation.x = -Math.PI / 2;
+      base.position.set(slant * 1.6, 0.02, 0);
+      meshes.push(base); group.add(base);
+
+      const beg = new THREE.EdgesGeometry(baseGeo);
+      const bl = new THREE.LineSegments(beg, new THREE.LineBasicMaterial({ color: 0xffffff }));
+      bl.rotation.x = -Math.PI / 2; bl.position.set(slant * 1.6, 0.04, 0);
+      edgeLines.push(bl); group.add(bl);
+    }
+
+    /* ═══════════════════════════════════════
+       PLANIFICAÇÃO — CILINDRO
+       Retângulo + 2 círculos
+    ═══════════════════════════════════════ */
+    function planCylinder() {
+      const R = 2, H = 4;
+      const circ = 2 * Math.PI * R;
+      const mat = makeMat(0x52b788, 0.9, THREE.DoubleSide);
+
+      // Retângulo lateral
+      const rectGeo = new THREE.PlaneGeometry(circ, H);
+      const rect = new THREE.Mesh(rectGeo, mat.clone());
+      rect.rotation.x = -Math.PI / 2;
+      rect.position.set(0, 0.02, 0);
+      meshes.push(rect); group.add(rect);
+      const reg = new THREE.EdgesGeometry(rectGeo);
+      const rl = new THREE.LineSegments(reg, new THREE.LineBasicMaterial({ color: 0xffffff }));
+      rl.rotation.x = -Math.PI / 2; rl.position.set(0, 0.04, 0);
+      edgeLines.push(rl); group.add(rl);
+
+      // 2 círculos
+      [-circ / 2 - R * 1.4, circ / 2 + R * 1.4].forEach(x => {
+        const cg = new THREE.CircleGeometry(R, 48);
+        const c = new THREE.Mesh(cg, mat.clone());
+        c.rotation.x = -Math.PI / 2; c.position.set(x, 0.02, 0);
+        meshes.push(c); group.add(c);
+        const ceg = new THREE.EdgesGeometry(cg);
+        const cel = new THREE.LineSegments(ceg, new THREE.LineBasicMaterial({ color: 0xffffff }));
+        cel.rotation.x = -Math.PI / 2; cel.position.set(x, 0.04, 0);
+        edgeLines.push(cel); group.add(cel);
+      });
+    }
+
+    /* ═══════════════════════════════════════
+       PLANIFICAÇÃO — PIRÂMIDE QUADRADA
+       Base quadrada + 4 triângulos em cruz
+    ═══════════════════════════════════════ */
+    function planPyramid() {
+      const s = 3, h = 3.8;
+      const slant = Math.sqrt((s / 2) ** 2 + h ** 2);
+      const mat = makeMat(0xd62828, 0.9, THREE.DoubleSide);
+
+      // Base central
+      const baseGeo = new THREE.PlaneGeometry(s, s);
+      const base = new THREE.Mesh(baseGeo, mat.clone());
+      base.rotation.x = -Math.PI / 2; base.position.set(0, 0.02, 0);
+      meshes.push(base); group.add(base);
+      addEdgeLine(baseGeo, 0, 0.04, 0);
+
+      // 4 faces triangulares
+      function triMesh(ox, oz, rotY) {
+        const shape = new THREE.Shape();
+        shape.moveTo(-s / 2, 0);
+        shape.lineTo(0, slant);
+        shape.lineTo(s / 2, 0);
+        shape.lineTo(-s / 2, 0);
+        const geo = new THREE.ShapeGeometry(shape, 1);
+        const m = new THREE.Mesh(geo, mat.clone());
+        m.rotation.x = -Math.PI / 2;
+        m.rotation.z = rotY;
+        m.position.set(ox, 0.02, oz);
+        meshes.push(m); group.add(m);
+        const eg = new THREE.EdgesGeometry(geo);
+        const el = new THREE.LineSegments(eg, new THREE.LineBasicMaterial({ color: 0xffffff }));
+        el.rotation.x = -Math.PI / 2; el.rotation.z = rotY;
+        el.position.set(ox, 0.04, oz);
+        edgeLines.push(el); group.add(el);
+      }
+
+      triMesh(0, -(s / 2 + slant / 2), 0);        // frente
+      triMesh(0, (s / 2 + slant / 2), Math.PI);  // trás
+      triMesh(-(s / 2 + slant / 2), 0, Math.PI / 2); // esquerda
+      triMesh((s / 2 + slant / 2), 0, -Math.PI / 2); // direita
+    }
+
+    /* ═══════════════════════════════════════
+       PLANIFICAÇÃO — PIRÂMIDE TRIANGULAR
+       Base equilateral + 3 faces
+    ═══════════════════════════════════════ */
+    function planTriPyramid() {
+      const a = 3.5; // lado
+      const h = a * Math.sqrt(3) / 2;
+      const slant = Math.sqrt((h / 3) ** 2 + 3 ** 2) * 1.1;
+      const mat = makeMat(0x9e64f0, 0.9, THREE.DoubleSide);
+
+      function triGeo(base) {
+        const shape = new THREE.Shape();
+        shape.moveTo(-base / 2, 0);
+        shape.lineTo(0, h);
+        shape.lineTo(base / 2, 0);
+        shape.lineTo(-base / 2, 0);
+        return new THREE.ShapeGeometry(shape, 1);
+      }
+
+      // Base central
+      const bg = triGeo(a);
+      const bm = new THREE.Mesh(bg, mat.clone());
+      bm.rotation.x = -Math.PI / 2; bm.position.set(0, 0.02, 0);
+      meshes.push(bm); group.add(bm);
+      const beg = new THREE.EdgesGeometry(bg);
+      const bel = new THREE.LineSegments(beg, new THREE.LineBasicMaterial({ color: 0xffffff }));
+      bel.rotation.x = -Math.PI / 2; bel.position.set(0, 0.04, 0);
+      edgeLines.push(bel); group.add(bel);
+
+      // 3 faces laterais ao redor
+      const offsets = [
+        [0, -(slant + h / 2), 0],
+        [-(slant * Math.cos(Math.PI / 6)), slant * 0.5, Math.PI * 2 / 3],
+        [(slant * Math.cos(Math.PI / 6)), slant * 0.5, -Math.PI * 2 / 3],
+      ];
+      offsets.forEach(([ox, oz, rz]) => {
+        const fg = triGeo(a);
+        const fm = new THREE.Mesh(fg, mat.clone());
+        fm.rotation.x = -Math.PI / 2; fm.rotation.z = rz;
+        fm.position.set(ox, 0.02, oz);
+        meshes.push(fm); group.add(fm);
+        const feg = new THREE.EdgesGeometry(fg);
+        const fel = new THREE.LineSegments(feg, new THREE.LineBasicMaterial({ color: 0xffffff }));
+        fel.rotation.x = -Math.PI / 2; fel.rotation.z = rz;
+        fel.position.set(ox, 0.04, oz);
+        edgeLines.push(fel); group.add(fel);
+      });
+    }
+
+    /* ═══════════════════════════════════════
+       PLANIFICAÇÃO — PARALELEPÍPEDO
+       Cruz com 6 retângulos (igual ao cubo mas proporcional)
+    ═══════════════════════════════════════ */
+    function planCuboid() {
+      const W = 4, H = 2, D = 3;
+      const mat = makeMat(0xff6496, 0.9, THREE.DoubleSide);
+
+      const faces = [
+        // [largura, profundidade, x_offset, z_offset]
+        [W, D, 0, 0],         // frente (top)
+        [W, H, 0, -(D + H) / 2 - 0.1],  // topo
+        [W, H, 0, (D + H) / 2 + 0.1],  // base
+        [H, D, -(W + H) / 2 - 0.1, 0],  // esquerda
+        [H, D, (W + H) / 2 + 0.1, 0],  // direita
+        [W, D, 0, D + H + 0.2],    // trás
+      ];
+
+      faces.forEach(([fw, fd, ox, oz]) => {
+        const geo = new THREE.PlaneGeometry(fw - 0.05, fd - 0.05);
+        const m = new THREE.Mesh(geo, mat.clone());
+        m.rotation.x = -Math.PI / 2; m.position.set(ox, 0.02, oz);
+        meshes.push(m); group.add(m);
+        const eg = new THREE.EdgesGeometry(new THREE.PlaneGeometry(fw, fd));
+        const el = new THREE.LineSegments(eg, new THREE.LineBasicMaterial({ color: 0xffffff }));
+        el.rotation.x = -Math.PI / 2; el.position.set(ox, 0.04, oz);
+        edgeLines.push(el); group.add(el);
+      });
+    }
+
+    /* ═══════════════════════════════════════
+       HELPER — BORDA DE PLANO
+    ═══════════════════════════════════════ */
+    function addEdgeLine(geo, x, y, z) {
+      const eg = new THREE.EdgesGeometry(geo);
+      const el = new THREE.LineSegments(eg, new THREE.LineBasicMaterial({ color: 0xffffff }));
+      el.rotation.x = -Math.PI / 2; el.position.set(x, y, z);
+      edgeLines.push(el); group.add(el);
+    }
+
+    /* ═══════════════════════════════════════
+       HELPER — LABEL 3D (texto no chão)
+       (canvas texture)
+    ═══════════════════════════════════════ */
+    function addPlanLabel(text, x, y, z) {
+      const cv = document.createElement('canvas');
+      cv.width = 512; cv.height = 128;
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = 'rgba(0,0,0,0)';
+      ctx.clearRect(0, 0, 512, 128);
+      ctx.font = 'bold 22px Nunito,sans-serif';
+      ctx.fillStyle = '#ffe08a';
+      const lines = text.split('\n');
+      lines.forEach((l, i) => ctx.fillText(l, 10, 30 + i * 32));
+      const tex = new THREE.CanvasTexture(cv);
+      const m = new THREE.Mesh(
+        new THREE.PlaneGeometry(8, 2),
+        new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false })
+      );
+      m.rotation.x = -Math.PI / 2;
+      m.position.set(x, y, z);
+      group.add(m);
+    }
+
+    /* ═══════════════════════════════════════
+       CRIAR SHAPE (modo 3D)
+    ═══════════════════════════════════════ */
+    function createShape3D(type) {
+      clearScene();
+      group = new THREE.Group();
+      scene.add(group);
+      isPlanified = false;
+
+      switch (type) {
+        case 'cube': createCube3D(); break;
+        case 'sphere': createSphere3D(); break;
+        case 'cone': createCone3D(); break;
+        case 'cylinder': createCylinder3D(); break;
+        case 'pyramid': createPyramid3D(); break;
+        case 'triPyramid': createTriPyramid3D(); break;
+        case 'cuboid': createCuboid3D(); break;
+      }
+
+      applyLayerVisibility();
+      animateIn();
+      updateInfoBar(type, false);
+      document.getElementById('plan-btn').textContent = '📐 Ver Planificação';
+      document.getElementById('mode-badge').textContent = 'MODO 3D';
+    }
+
+    /* ═══════════════════════════════════════
+       CRIAR PLANIFICAÇÃO
+    ═══════════════════════════════════════ */
+    function createPlanification(type) {
+      clearScene();
+      group = new THREE.Group();
+      scene.add(group);
+      isPlanified = true;
+
+      switch (type) {
+        case 'cube': planCube(); break;
+        case 'sphere': planSphere(); break;
+        case 'cone': planCone(); break;
+        case 'cylinder': planCylinder(); break;
+        case 'pyramid': planPyramid(); break;
+        case 'triPyramid': planTriPyramid(); break;
+        case 'cuboid': planCuboid(); break;
+      }
+
+      applyLayerVisibility();
+      animateIn();
+      updateInfoBar(type, true);
+      document.getElementById('plan-btn').textContent = '🔷 Ver Forma 3D';
+      document.getElementById('mode-badge').textContent = 'PLANIFICAÇÃO';
+    }
+
+    /* ═══════════════════════════════════════
+       TOGGLE PLANIFICAÇÃO
+    ═══════════════════════════════════════ */
+    function togglePlanification() {
+      if (!isAnimating) {
+        if (isPlanified) createShape3D(currentShape);
+        else createPlanification(currentShape);
+      }
+    }
+
+    /* ═══════════════════════════════════════
+       SELECIONAR SHAPE
+    ═══════════════════════════════════════ */
+    function select(type, btn) {
+      currentShape = type;
+      document.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      createShape3D(type);
+    }
+
+    /* ═══════════════════════════════════════
+       ATUALIZAR INFO BAR
+    ═══════════════════════════════════════ */
+    function updateInfoBar(type, planMode) {
+      const d = SHAPES[type];
+      document.getElementById('shape-name').textContent = planMode ? 'Planificação — ' + d.name : d.name;
+      document.getElementById('shape-props').textContent = d.props;
+      document.getElementById('shape-desc').textContent = d.desc;
+    }
+
+    /* ═══════════════════════════════════════
+       CAMADAS DE VISIBILIDADE
+    ═══════════════════════════════════════ */
+    function applyLayerVisibility() {
+      const showFaces = document.getElementById('chk-faces').checked;
+      const showEdges = document.getElementById('chk-edges').checked;
+      const showVerts = document.getElementById('chk-verts').checked;
+      meshes.forEach(m => m.visible = showFaces);
+      edgeLines.forEach(l => l.visible = showEdges);
+      vertDots.forEach(v => v.visible = showVerts);
+    }
+
+    function toggleLayer(layer, val) {
+      if (layer === 'faces') meshes.forEach(m => m.visible = val);
+      if (layer === 'edges') edgeLines.forEach(l => l.visible = val);
+      if (layer === 'verts') vertDots.forEach(v => v.visible = val);
+    }
+
+    /* ═══════════════════════════════════════
+       RESIZE
+    ═══════════════════════════════════════ */
+    function onResize() {
+      const W = window.innerWidth - 270;
+      const H = window.innerHeight;
+      camera.aspect = W / H;
+      camera.updateProjectionMatrix();
+      renderer.setSize(W, H);
+      canvas.style.marginLeft = '270px';
+    }
+    window.addEventListener('resize', onResize);
+    onResize();
+
+    /* ════════════════════════════════════
+       LOOP
+    ═══════════════════════════════════════ */
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      // Auto-rotação quando em modo 3D
+      if (group && !isPlanified) {
+        group.rotation.y += 0.0032;
+      }
+      renderer.render(scene, camera);
+    }
+    animate();
+    createShape3D('cube');
+    // E... FIM! AMÉM
+  </script>
+</body>
+
+
+
+</html>
