@@ -470,7 +470,25 @@ Projeto disponível em:
 
 ---
 
-# 17. Conclusão
+# 17. Apresentação Visual do Projeto
+<img width="1902" height="1076" alt="Captura de tela 2026-05-25 105459" src="https://github.com/user-attachments/assets/1bcb926e-3ad7-41a5-9d1a-02a2477a9e8c" />
+<img width="1901" height="1079" alt="Captura de tela 2026-05-25 105517" src="https://github.com/user-attachments/assets/3f9d7962-5d19-4200-adc0-10b8753b2819" />
+<img width="1902" height="1079" alt="Captura de tela 2026-05-25 105527" src="https://github.com/user-attachments/assets/7db57171-ea16-4b7e-a159-a1f90ed8051b" />
+<img width="1904" height="1078" alt="Captura de tela 2026-05-25 105538" src="https://github.com/user-attachments/assets/6334ac39-c3d3-43ed-b248-4c20b0583b22" />
+<img width="1902" height="1077" alt="Captura de tela 2026-05-25 105545" src="https://github.com/user-attachments/assets/733f69c4-f02b-4af7-9c6d-ccd33ff25c2f" />
+<img width="1903" height="1003" alt="Captura de tela 2026-05-25 105553" src="https://github.com/user-attachments/assets/b2055f6e-0cd7-4a94-9259-56f4f528850a" />
+<img width="1902" height="1078" alt="Captura de tela 2026-05-25 105600" src="https://github.com/user-attachments/assets/91412fe6-1160-4f4f-abbd-c6bfdd792b95" />
+<img width="1901" height="1079" alt="Captura de tela 2026-05-25 105606" src="https://github.com/user-attachments/assets/252d8f0a-ad44-41b3-9c45-2fab1a7b9974" />
+<img width="1916" height="1075" alt="Captura de tela 2026-05-25 105633" src="https://github.com/user-attachments/assets/dea6ebcb-7456-4a5a-8663-96d7ae29a822" />
+<img width="1917" height="1075" alt="Captura de tela 2026-05-25 105655" src="https://github.com/user-attachments/assets/3ca0c5e3-e05d-4cd6-ab3c-3ddf61eab0f6" />
+<img width="1915" height="940" alt="Captura de tela 2026-05-25 105719" src="https://github.com/user-attachments/assets/4c8a8f4b-35c7-45a2-a7be-d5b2aa6f6a75" />
+<img width="1910" height="940" alt="Captura de tela 2026-05-25 105757" src="https://github.com/user-attachments/assets/ffb92b35-c389-4b18-b2bb-9a150afc4809" />
+<img width="1916" height="945" alt="Captura de tela 2026-05-25 105836" src="https://github.com/user-attachments/assets/7757d7ac-b0d6-4fb2-9ad9-256fc20902c4" />
+<img width="1916" height="937" alt="Captura de tela 2026-05-25 105909" src="https://github.com/user-attachments/assets/f4bdede0-3bde-4100-88b0-7c0ae6b1bb24" />
+<img width="1917" height="941" alt="Captura de tela 2026-05-25 105922" src="https://github.com/user-attachments/assets/6ed30104-4759-428c-8f92-85f20bb24e24" />
+<img width="1919" height="945" alt="Captura de tela 2026-05-25 105930" src="https://github.com/user-attachments/assets/5c4dab1d-1dc4-4b7c-ad8a-6c49ab680ed9" />
+
+# 18. Conclusão
 
 O projeto atingiu os objetivos propostos pela disciplina ao desenvolver uma solução 3D interativa utilizando Computação Gráfica como núcleo tecnológico principal.
 
