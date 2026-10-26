@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>InclusivaMente Matemática</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
-<link rel="shortcut icon" href="assets/matematica.png" type="image/x-icon">
+<link rel="shortcut icon" href="assets/favicon.png" type="image/x-icon">
 <style>
   :root {
     --accent: #1E88E5;    
@@ -137,6 +137,14 @@
     color: rgba(255,255,255,0.5);
     letter-spacing: 0.08em;
     text-transform: uppercase;
+  }
+
+    .logo-img {
+    height: 60px;
+    width: auto;
+    display: block;
+    filter: drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff)
+            drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff);
   }
 
   .nav-links {
@@ -953,18 +961,7 @@
 
   <nav>
     <a href="#" class="nav-logo">
-      <div class="logo-mark">
-        <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="2" y="2" width="9" height="9" rx="2" fill="white" fill-opacity="0.9"/>
-          <rect x="15" y="2" width="9" height="9" rx="2" fill="white" fill-opacity="0.5"/>
-          <rect x="2" y="15" width="9" height="9" rx="2" fill="white" fill-opacity="0.5"/>
-          <path d="M17 19 L22 19 M19.5 16.5 L19.5 21.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div class="logo-text">
-        InclusivaMente
-        <span>Matemática</span>
-      </div>
+      <img src="assets/Logo Inclusivamente.png" alt="InclusivaMente Matemática" class="logo-img">
     </a>
     <ul class="nav-links">
       <li><a href="#sobre">Sobre</a></li>
